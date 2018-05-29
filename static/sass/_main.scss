@@ -1,3 +1,20 @@
-.colorful {
-  color: $clrHilight;
+// Globals
+h1 {
+	margin-bottom: 0;
+	margin-top: 0;
+}
+
+// Visually strong line of text that fills its width and draws attention.
+.tagline {
+	font-size: 1.4em;
+	border-bottom: $border-width solid $highlight-color;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+// Small line directly after a title
+.subtitle {
+	margin-top: 0;
+	font-style: italic;
+	font-size: 1.8em;
 }

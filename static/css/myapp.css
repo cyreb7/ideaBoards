@@ -1,4 +1,20 @@
-/* line 1, ../sass/_main.scss */
-.colorful {
-  color: #bb8833;
+/* line 2, ../sass/_main.scss */
+h1 {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+/* line 8, ../sass/_main.scss */
+.tagline {
+  font-size: 1.4em;
+  border-bottom: 3px solid black;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* line 16, ../sass/_main.scss */
+.subtitle {
+  margin-top: 0;
+  font-style: italic;
+  font-size: 1.8em;
 }
