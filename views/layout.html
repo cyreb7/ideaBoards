@@ -18,36 +18,43 @@
       {{=response.flash}}
     </div>
     {{pass}}
-    <header class="black padded">
-      <div class="container middle max900">
-        <div class="fill middle">
-          <label class="ham padded fa fa-bars" for="menu"></label>
-          <div class="burger accordion">
-            <input type="checkbox" id="menu"/>
-            {{=MENU(response.menu,_class='menu')}}
-            <ul class="menu right">
-              <li>
-                {{=auth.navbar(mode='dropdown')}}
-              </li>
-            </ul>
-          </div>
+    <header class="black container max900">
+      <h1>Idea Boards</h1>
+      <div class="fill middle">
+        <label class="ham padded fa fa-bars" for="menu"></label>
+        <div class="burger accordion">
+          <input type="checkbox" id="menu"/>
+          {{=MENU(response.menu,_class='menu')}}
+          <ul class="menu right">
+            <li>
+              {{=auth.navbar(mode='dropdown')}}
+            </li>
+          </ul>
         </div>
       </div>
     </header>
     <main class="white">
       {{include}}
     </main>
-    <footer class="black">
-      <div class="silver center padded social">
-        <a class="fa fa-facebook" href="https://www.facebook.com/sharer/sharer.php?u={url}"></a>
-        <a class="fa fa-twitter" href="https://twitter.com/home?status={url}"></a>
-        <a class="fa fa-google" href="https://plus.google.com/share?url={url}"></a>
-      </div>
-      <div class="container padded max900">
-        <div class="fill">
-          Copyright @ 2016
-        </div>
-      </div>
+    <footer class="black container max900">
+      <h2>Created By</h2>
+      
+      <h3>Bryce Newbury</h3>
+      <p>
+        Producer, CSS expert, and all around UI manager.
+      </p>
+      
+      <h3>Aadam Mohammad</h3>
+      <p>
+        In charge of letting you brainstorm with Boards.
+      </p>
+      
+      <h3>Christopher Bui</h3>
+      <p>
+        Database and backend expert, ensuring your Cards are properly saved.
+      </p>
+      
+      <p class="center spaced">Copyright 2018</p>
     </footer>
   </body>
   <script src="{{=URL('static','js/marked.min.js')}}"></script>
