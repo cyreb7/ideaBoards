@@ -1,7 +1,6 @@
 {{extend 'layout.html'}}
 
 {{block head}}
-<script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
     var my_url = "{{=URL('api', 'my_method')}}";
 </script>
@@ -11,4 +10,4 @@
     <h2>Decks</h2>
 </div>
 
-<script src="{{=URL('static', 'js/default_index.js')}}"></script>
+<script src="{{=URL('static', 'js/decks_index.js')}}"></script>
