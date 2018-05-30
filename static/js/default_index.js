@@ -57,7 +57,7 @@ var app = function() {
         self.close_uploader();
         console.log('The file was uploaded; it is now available at ' + get_url);
         // The file is uploaded.  Now you have to insert the get_url into the database, etc.
-        $.post(add_image_url,
+        $.post(add_card_url,
             {
                 image_url: get_url
             },
@@ -70,26 +70,61 @@ var app = function() {
             }, 1200))
     };
 
-    //show images belonging to signed in user
-    self.show_images = function(){
-        $.get(show_images_url,
-            function (images) {
-                self.vue.curr_images = images;
-                self.vue.self_page = true;
-            });
+    //changes our vue boolean to true to allow user to create new deck
+    self.add_new_deck = function(){
+        self.vue.adding_deck = true;
     }
 
-    //show images belonging to a different user
-    self.other_user_images = function(uid){
-        $.post(show_diff_images_url,
+    //canceling creating new deck
+    self.cancel_new_deck = function(){
+        self.vue.form_deck_name = null;
+        self.vue.adding_deck = false;
+    }
+
+    //finalize creation of new deck
+    self.submit_new_deck = function(){
+        $.post(add_deck_url,
             {
-                uid: uid
+                deck_name: self.vue.form_deck_name
             },
-            function (diff_images) {
-                self.vue.curr_images = diff_images;
-                self.vue.self_page = false;
+            function (data) {
+                self.vue.curr_decks.push(data);
+            });
+
+        //upon completion, set view back to normal
+        self.vue.form_deck_name = null;
+        self.vue.adding_deck = false;
+    }
+
+    //show cards belonging to the given deck
+    self.get_cards = function(deckid){
+        $.post(show_cards_url,
+            {
+                deckid: deckid
+            },
+            function (cards) {
+                self.vue.curr_cards = cards;
+                self.vue.show_decks = false;
             })
     }
+
+    self.get_decks = function(){
+        $.get(get_decks_url,
+            function(decks){
+                self.vue.curr_decks = decks;
+            }
+        )
+    }
+
+    //DEBUG FUNCTION
+    self.delete_my_decks = function(){
+        $.get(delete_my_decks_url,
+            function(){
+                self.vue.curr_decks = [];
+            }
+        )
+    }
+
 
     //our vue object
     self.vue = new Vue({
@@ -97,19 +132,25 @@ var app = function() {
         delimiters: ['${', '}'],
         unsafeDelimiters: ['!{', '}'],
         data: {
-            logged_in: false,
+            adding_deck: false,
+            form_deck_name: null,
+            show_decks: true,
             is_uploading: false,
-            self_page: true, // Leave it to true, so initially you are looking at your own images.
-            curr_images: [],
-            user_list: [],
+            curr_decks: [],
+            curr_cards: [],
             curr_user: null
         },
         methods: {
             open_uploader: self.open_uploader,
             close_uploader: self.close_uploader,
             upload_file: self.upload_file,
-            show_images: self.show_images,
-            other_user_images: self.other_user_images
+            add_new_deck: self.add_new_deck,
+            cancel_new_deck: self.cancel_new_deck,
+            submit_new_deck: self.submit_new_deck,
+            get_decks: self.get_decks,
+            get_cards: self.get_cards,
+            //debug functions
+            delete_my_decks: self.delete_my_decks
         }
 
     });
@@ -122,14 +163,9 @@ var app = function() {
                 self.vue.logged_in = (user != null);
                 //if user is logged in, get other users and store current user
                 if(self.vue.logged_in){
+                    self.get_decks();
+                    console.log("hi");
                     self.vue.curr_user = user;
-                    $.getJSON(get_users_url,
-                        function(data){
-                            self.vue.user_list = data.other_users;
-                        }
-                    )
-                    //by default, show images of signed in user
-                    self.show_images();
                 }
             });
 

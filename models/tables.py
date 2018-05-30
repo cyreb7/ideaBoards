@@ -7,13 +7,14 @@
 # There is an implicit 'id integer autoincrement' field
 # Consult manual for more options, validators, etc.
 
-
+#define db table for decks
 db.define_table('decks',
                 Field('deck_name'),
                 Field('created_on', 'datetime', default=request.now),
                 Field('created_by', 'reference auth_user', default=auth.user_id)
                 )
 
+#define db table for cards
 db.define_table('cards',
                 Field('created_on', 'datetime', default=request.now),
                 Field('created_by', 'reference auth_user', default=auth.user_id),

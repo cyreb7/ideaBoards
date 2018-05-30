@@ -16,7 +16,19 @@ def add_deck():
         #add url, all other fields are set by default
         deck_name = request.vars.deck_name
     )
-    return "done"
+    return response.json(dict(
+        id = t_id,
+        deck_name = request.vars.deck_name,
+        user_email = auth.user.email
+    ))
+
+@auth.requires_signature()
+def get_decks():
+    curr_decks = []
+    rows = db(db.decks.created_by == auth.user_id).select()
+    for r in rows:
+        curr_decks.append(r)
+    return response.json(curr_decks)
 
 '''
 show all cards belonging to a deck
@@ -37,3 +49,10 @@ def login_status():
     if auth.user is None:
         return None
     return auth.user.first_name
+
+'''
+DEBUG: delete all decks for current user
+'''
+@auth.requires_signature()
+def delete_my_decks():
+    db(db.decks.created_by == auth.user_id).delete()

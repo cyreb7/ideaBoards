@@ -3,12 +3,69 @@
 {{block head}}
 <script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
-    var my_url = "{{=URL('api', 'my_method')}}";
+    var login_status_url = "{{=URL('api', 'login_status', user_signature=True)}}";
+    var add_deck_url = "{{=URL('api', 'add_deck', user_signature=True)}}";
+    var get_decks_url = "{{=URL('api', 'get_decks', user_signature=True)}}";
+    var add_card_url = "{{=URL('api', 'add_card', user_signature=True)}}";
+    var show_cards_url = "{{=URL('api', 'show_cards', user_signature=True)}}";
+
+    var delete_my_decks_url = "{{=URL('api', 'delete_my_decks', user_signature=True)}}";
 </script>
 {{end}}
 
+{{if auth.user is not None:}}
 <div id="vue-div" class="display:none">
-    <h2>Decks</h2>
+    <!--by default, show a list of decks belonging to a user-->
+    <div v-if="show_decks">
+        <h2>My Decks</h2>
+        <button v-if="!adding_deck" class="btn red" v-on:click="add_new_deck()">
+            <i class="fa fa-plus"></i> New Deck
+        </button>
+        <!--Allow user to create new decks-->
+        <div v-else>
+            <form action="#" v-on:submit.prevent enctype="multipart/form-data" method="post">
+                <div class="form-group">
+                  <div>
+                    <input class="form-control string"
+                          v-model="form_deck_name" placeholder="Deck Name" type="text" />
+                    <span class="help-block"></span>
+                  </div>
+                </div>
+              </form>
+              <!--button to add the memo with the above title and description -->
+              <button class="btn red" v-on:click="submit_new_deck()">
+                create
+              </button>
+              <button class="btn red" v-on:click="cancel_new_deck()">
+                cancel
+              </button>
+        </div>
+        
+        <table class="fill" id="user_selector">
+            <!--show all other users-->
+            <tbody v-for="d in curr_decks">
+              <!--on click, show images of that user-->
+              <td v-on:click="get_cards(d.id)">${d.deck_name}</td>
+            </tbody>
+          </table>
+    </div>
+    <!--if a deck is selected, display all cards associated with the deck-->
+    <div v-else>
+        <h2>A deck was selected:</h2>
+    </div>
+
+    <!--Some buttons for debugging-->
+    <button class="btn red" v-on:click="delete_my_decks()">
+            debug delete
+          </button>
+
 </div>
+
+{{else:}}
+<h2>Please login to view decks</h2>
+<div class="login_button">
+    <a href="{{=URL('default', 'user')}}" class="btn">Login</a>
+</div>
+{{pass}}
 
 <script src="{{=URL('static', 'js/default_index.js')}}"></script>
