@@ -1,7 +1,6 @@
 {{extend 'layout.html'}}
 
 {{block head}}
-<script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
     var login_status_url = "{{=URL('api', 'login_status', user_signature=True)}}";
     var add_deck_url = "{{=URL('api', 'add_deck', user_signature=True)}}";
@@ -68,4 +67,4 @@
 </div>
 {{pass}}
 
-<script src="{{=URL('static', 'js/default_index.js')}}"></script>
+<script src="{{=URL('static', 'js/decks_index.js')}}"></script>

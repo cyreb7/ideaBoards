@@ -13,6 +13,7 @@
     {{include "web2py_ajax.html"}}
   </head>
   <body class="black">
+    <script src="{{=URL('static', 'js/vue.js')}}"></script>
     {{if response.flash:}}
     <div class="w2p_flash">
       {{=response.flash}}
