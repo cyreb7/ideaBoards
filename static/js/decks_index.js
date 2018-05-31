@@ -53,6 +53,7 @@ var app = function() {
         // Hides the uploader div.
         self.close_uploader();
         console.log('The file was uploaded; it is now available at ' + get_url);
+        self.vue.just_added = true;
         // The file is uploaded.  Now you have to insert the get_url into the database, etc.
         $.post(get_deck_name_url,
             {
@@ -65,11 +66,19 @@ var app = function() {
                         deck_id: self.vue.open_deck_id,
                         image_url: get_url
                     },
-                    //execute the below code after a brief delay to allow image upload to finish
-                    setTimeout(function (uploaded_url) { 
-                        self.vue.curr_cards.push(get_url);
-                        console.log(self.vue.curr_cards);
-                    }, 1200))
+                    function(data){
+                        //execute the below code after a brief delay to allow image upload to finish
+                        card = {}
+                        card.card_id = data.id;
+                        card.deck_id = data.deck_id;
+                        card.deck_name = data.deck_name;
+
+                        setTimeout(function (uploaded_url) {
+                            card.card_image_url = get_url;
+                            self.vue.curr_cards.push(card);
+                            console.log(card)
+                        }, 1200)
+                    })
             }
         )
     };
@@ -100,6 +109,17 @@ var app = function() {
         self.vue.adding_deck = false;
     }
 
+    self.delete_card = function(cardid){
+        $.post(del_card_url,
+            {
+                card_id: cardid
+            },
+            function (data) {
+                self.vue.just_added = false;
+                self.get_cards(self.vue.open_deck_id);
+            })
+    }
+
     //show cards belonging to the given deck
     self.get_cards = function(deckid){
         $.post(show_cards_url,
@@ -109,8 +129,8 @@ var app = function() {
             function (data) {
                 self.vue.open_deck_id = data.deck_id;
                 self.vue.open_deck_name = data.deck_name;
-                self.vue.curr_cards = data.cards;
                 self.vue.show_decks = false;
+                self.vue.curr_cards = data.cards;
             })
     }
 
@@ -123,6 +143,7 @@ var app = function() {
     }
 
     self.back_to_decks = function(){
+        self.vue.just_added = false;
         self.vue.show_decks = true;
     }
 
@@ -150,7 +171,7 @@ var app = function() {
             open_deck_name: null,
             curr_decks: [],
             curr_cards: [],
-            curr_user: null
+            just_added: false
         },
         methods: {
             open_uploader: self.open_uploader,
@@ -166,6 +187,7 @@ var app = function() {
 
             add_new_card: self.add_new_card,
             back_to_decks: self.back_to_decks,
+            delete_card: self.delete_card,
             //debug functions
             delete_my_decks: self.delete_my_decks
         }
@@ -181,7 +203,6 @@ var app = function() {
                 //if user is logged in, get other users and store current user
                 if(self.vue.logged_in){
                     self.get_decks();
-                    self.vue.curr_user = user;
                 }
             });
 

@@ -6,6 +6,7 @@
     var add_deck_url = "{{=URL('api', 'add_deck', user_signature=True)}}";
     var get_decks_url = "{{=URL('api', 'get_decks', user_signature=True)}}";
     var add_card_url = "{{=URL('api', 'add_card', user_signature=True)}}";
+    var del_card_url = "{{=URL('api', 'del_card', user_signature=True)}}";
     var show_cards_url = "{{=URL('api', 'show_cards', user_signature=True)}}";
 
     var get_deck_name_url = "{{=URL('api', 'get_deck_name', user_signature=True)}}";
@@ -62,12 +63,14 @@
 
       <button v-if="!is_uploading" v-on:click="open_uploader">add card</button>
       <button v-if="is_uploading"  v-on:click="close_uploader">Cancel</button>
-      <h3 v-if="curr_cards.length==0">You have no cards at the moment</h3>
+      <h3 v-if="curr_cards.length==0 && !just_added">You have no cards at the moment</h3>
       <div v-else>
         <div class="image_container">
           <ul class="container">
-            <li v-for="image in curr_cards" class="card lifted padded quarter">
-              <img v-bind:src="image" height="200px" width="200px" class="padded"/>
+            <li v-for="image in curr_cards" class="card lifted padded quarter" style="margin-right:30px;">
+              <img v-bind:src="image.card_image_url" height="200px" width="200px" class="padded"/>
+              <button v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
+                  <i class="fa fa-trash fa-lg"></i></button>
             </li> 
           </ul>
         </div>

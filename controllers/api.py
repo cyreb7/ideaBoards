@@ -37,14 +37,21 @@ show all cards belonging to a deck
 def show_cards():
     curr_cards = []
     rows = db(db.cards.deck_id == request.vars.deckid).select()
+    
     #iterate over resulting query and add all images of user to our returned image list
     for r in rows:
-        curr_cards.append(r.card_image_url)
+        c = dict(
+        card_id = r.id,
+        deck_id = r.deck_id,
+        deck_name = r.deck_name,
+        card_image_url = r.card_image_url
+        )
+
+        curr_cards.append(c)
     return response.json(dict(
         cards=curr_cards,
         deck_id=request.vars.deckid,
         deck_name=db(db.decks.id == request.vars.deckid).select().first().deck_name
-
     ))
 
 '''
@@ -62,6 +69,16 @@ def add_card():
         deck_id = request.vars.deck_id,
         card_image_url = request.vars.image_url
     )
+    return response.json(dict(
+        id = t_id,
+        deck_name = request.vars.deck_name,
+        deck_id = request.vars.deck_id,
+        card_image_url = request.vars.image_url
+    ))
+
+@auth.requires_signature()
+def del_card():
+    db(db.cards.id == request.vars.card_id).delete()
     return "done"
 
 '''
