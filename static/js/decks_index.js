@@ -72,6 +72,10 @@ var app = function() {
         self.vue.adding_deck = true;
     }
 
+    self.add_new_card = function(){
+        alert("work in progress");
+    }
+
     //canceling creating new deck
     self.cancel_new_deck = function(){
         self.vue.form_deck_name = null;
@@ -99,8 +103,10 @@ var app = function() {
             {
                 deckid: deckid
             },
-            function (cards) {
-                self.vue.curr_cards = cards;
+            function (data) {
+                self.vue.open_deck_id = data.deck_id;
+                self.vue.open_deck_name = data.deck_name;
+                self.vue.curr_cards = data.cards;
                 self.vue.show_decks = false;
             })
     }
@@ -111,6 +117,10 @@ var app = function() {
                 self.vue.curr_decks = decks;
             }
         )
+    }
+
+    self.back_to_decks = function(){
+        self.vue.show_decks = true;
     }
 
     //DEBUG FUNCTION
@@ -133,6 +143,8 @@ var app = function() {
             form_deck_name: null,
             show_decks: true,
             is_uploading: false,
+            open_deck_id: null,
+            open_deck_name: null,
             curr_decks: [],
             curr_cards: [],
             curr_user: null
@@ -141,11 +153,16 @@ var app = function() {
             open_uploader: self.open_uploader,
             close_uploader: self.close_uploader,
             upload_file: self.upload_file,
+
             add_new_deck: self.add_new_deck,
             cancel_new_deck: self.cancel_new_deck,
             submit_new_deck: self.submit_new_deck,
+
             get_decks: self.get_decks,
             get_cards: self.get_cards,
+
+            add_new_card: self.add_new_card,
+            back_to_decks: self.back_to_decks,
             //debug functions
             delete_my_decks: self.delete_my_decks
         }

@@ -34,13 +34,18 @@ def get_decks():
 show all cards belonging to a deck
 '''
 @auth.requires_signature()
-def show_images():
+def show_cards():
     curr_cards = []
-    rows = db(db.cards.deck_name == request.vars.deck_name).select()
+    rows = db(db.cards.deck_id == request.vars.deckid).select()
     #iterate over resulting query and add all images of user to our returned image list
     for r in rows:
         curr_cards.append(r.card_image_url)
-    return response.json(curr_images)
+    return response.json(dict(
+        cards=curr_cards,
+        deck_id=request.vars.deckid,
+        deck_name=db(db.decks.id == request.vars.deckid).select().first().deck_name
+
+    ))
 
 '''
 get login status. return user first name if they are signed in

@@ -50,13 +50,21 @@
     </div>
     <!--if a deck is selected, display all cards associated with the deck-->
     <div v-else>
-        <h2>A deck was selected:</h2>
+      <button class="btn red" v-on:click="back_to_decks()">
+        back
+      </button>
+      <h2>The deck * ${open_deck_name} * was selected with an id of ${open_deck_id}</h2>
+      <button class="btn red" v-on:click="add_new_card()">
+        add card
+      </button>
+      <h3 v-if="curr_cards.length==0">You have no cards at the moment</h3>
+      <h3 v-else>there are cards</h3>
     </div>
 
     <!--Some buttons for debugging-->
     <button class="btn red" v-on:click="delete_my_decks()">
             debug delete
-          </button>
+    </button>
 
 </div>
 
