@@ -54,26 +54,29 @@ var app = function() {
         self.close_uploader();
         console.log('The file was uploaded; it is now available at ' + get_url);
         // The file is uploaded.  Now you have to insert the get_url into the database, etc.
-        $.post(add_card_url,
+        $.post(get_deck_name_url,
             {
-                image_url: get_url
+                deck_id: self.vue.open_deck_id
             },
-            //execute the below code after a brief delay to allow image upload to finish
-            setTimeout(function (uploaded_url) {
-                
-                self.vue.curr_images.push(get_url);
-                enumerate(self.vue.curr_images);
-                console.log(self.vue.curr_images);
-            }, 1200))
+            function(d_name){
+                $.post(add_card_url,
+                    {
+                        deck_name: d_name,
+                        deck_id: self.vue.open_deck_id,
+                        image_url: get_url
+                    },
+                    //execute the below code after a brief delay to allow image upload to finish
+                    setTimeout(function (uploaded_url) { 
+                        self.vue.curr_cards.push(get_url);
+                        console.log(self.vue.curr_cards);
+                    }, 1200))
+            }
+        )
     };
 
     //changes our vue boolean to true to allow user to create new deck
     self.add_new_deck = function(){
         self.vue.adding_deck = true;
-    }
-
-    self.add_new_card = function(){
-        alert("work in progress");
     }
 
     //canceling creating new deck

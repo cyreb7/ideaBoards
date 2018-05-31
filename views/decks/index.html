@@ -8,6 +8,7 @@
     var add_card_url = "{{=URL('api', 'add_card', user_signature=True)}}";
     var show_cards_url = "{{=URL('api', 'show_cards', user_signature=True)}}";
 
+    var get_deck_name_url = "{{=URL('api', 'get_deck_name', user_signature=True)}}";
     var delete_my_decks_url = "{{=URL('api', 'delete_my_decks', user_signature=True)}}";
 </script>
 {{end}}
@@ -54,11 +55,24 @@
         back
       </button>
       <h2>The deck * ${open_deck_name} * was selected with an id of ${open_deck_id}</h2>
-      <button class="btn red" v-on:click="add_new_card()">
-        add card
-      </button>
+      <!-- Code to upload files, with control buttons -->
+      <div id="uploader_div" style="display:none">
+        Upload an image file: <input id="file_input" type="file" v-on:change="upload_file" accept="image/jpeg">
+      </div>
+
+      <button v-if="!is_uploading" v-on:click="open_uploader">add card</button>
+      <button v-if="is_uploading"  v-on:click="close_uploader">Cancel</button>
       <h3 v-if="curr_cards.length==0">You have no cards at the moment</h3>
-      <h3 v-else>there are cards</h3>
+      <div v-else>
+        <div class="image_container">
+          <ul class="container">
+            <li v-for="image in curr_cards" class="card lifted padded quarter">
+              <img v-bind:src="image" height="200px" width="200px" class="padded"/>
+            </li> 
+          </ul>
+        </div>
+      </div>
+
     </div>
 
     <!--Some buttons for debugging-->

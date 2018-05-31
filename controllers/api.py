@@ -48,6 +48,23 @@ def show_cards():
     ))
 
 '''
+get the deck name given the deck id
+'''
+@auth.requires_signature()
+def get_deck_name():
+    return db(db.decks.id == request.vars.deck_id).select().first().deck_name
+
+
+@auth.requires_signature()
+def add_card():
+    t_id = db.cards.insert(
+        deck_name = request.vars.deck_name,
+        deck_id = request.vars.deck_id,
+        card_image_url = request.vars.image_url
+    )
+    return "done"
+
+'''
 get login status. return user first name if they are signed in
 '''
 def login_status():
