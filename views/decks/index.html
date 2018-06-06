@@ -11,6 +11,8 @@
 
     var get_deck_name_url = "{{=URL('api', 'get_deck_name', user_signature=True)}}";
     var delete_my_decks_url = "{{=URL('api', 'delete_my_decks', user_signature=True)}}";
+    
+    var upload_url = "{{=URL('uploader', 'get_upload_url')}}";
 </script>
 {{end}}
 
@@ -92,4 +94,5 @@
 </div>
 {{pass}}
 
+<script src="{{=URL('static','js/sha1.min.js')}}"></script>
 <script src="{{=URL('static', 'js/decks_index.js')}}"></script>

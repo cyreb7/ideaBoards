@@ -33,34 +33,44 @@ var app = function() {
         // Reads the file.
         var input = event.target;
         
-        var reader  = new FileReader();
+        var readerURL  = new FileReader();
+        // Need two copies because we need to read it twice
+        var readerArray = new FileReader();
         var file = input.files[0];
         
-        // Save data-URL for later
-        reader.addEventListener("load", function () {
-            self.upload_image.data_url = reader.result;
-        }, false);
         
         if (file) {
+            // Need to hash
+            readerArray.readAsArrayBuffer(file);
+            // Need to display image
+            readerURL.readAsDataURL(file);
+        }
+        
+        readerURL.addEventListener("load", function () {
+            // Save data-URL for later
+            self.upload_image.data_url = readerURL.result;
+        }, false);
+        
+        readerArray.addEventListener("load", function () {
             // First, gets an upload URL.
             console.log("Trying to get the upload url");
-            $.getJSON('https://upload-dot-luca-teaching.appspot.com/start/uploader/get_upload_url',
+            $.getJSON(upload_url,
                 function (data) {
-                    // We now have upload (and download) URLs.
-                    var put_url = data['signed_url'];
-                    var get_url = data['access_url'];
-                    console.log("Received upload url: " + put_url);
+                    console.log("Received upload url");
                     // Uploads the file, using the low-level interface.
                     var req = new XMLHttpRequest();
                     req.addEventListener("load", self.upload_complete(get_url));
                     // TODO: if you like, add a listener for "error" to detect failure.
-                    req.open("PUT", put_url, true);
+                    req.open("PUT", data['uploadUrl'], true);
+                    
+                    // Set headers as required by https://www.backblaze.com/b2/docs/b2_upload_file.html
+                    req.setRequestHeader("Authorization", data['authorizationToken']);
+                    req.setRequestHeader("X-Bz-File-Name", data['file_name'] + file.name);
+                    req.setRequestHeader("X-Bz-Content-Sha1", sha1(readerArray.result));
+                    
                     req.send(file);
                 });
-            
-            // Start reading file into data-URL
-            reader.readAsDataURL(file);
-        }
+        }, false);
     };
 
     self.upload_complete = function(get_url) {
@@ -86,14 +96,6 @@ var app = function() {
                         card.card_id = data.id;
                         card.deck_id = data.deck_id;
                         card.deck_name = data.deck_name;
-
-                        // Find best way to display image
-                        // Fall back to using image URL if the data-URL is not done in time
-                        if (self.upload_image.data_url == null) {
-                            self.upload_image.data_url = get_url;
-                            console.log("Data-URL not available in time, falling back to upload URL");
-                        }
-
                         card.card_image_url = self.upload_image.data_url;
                         self.vue.curr_cards.push(card);
                         console.log(card)
