@@ -3,6 +3,9 @@ var app = function() {
     var self = {};
     
     Vue.config.silent = false; // show all warnings
+    
+    // Stores any currently uploading images
+    self.upload_image = {};
 
     // Extends an array
     self.extend = function(a, b) {
@@ -29,7 +32,15 @@ var app = function() {
     self.upload_file = function (event) {
         // Reads the file.
         var input = event.target;
+        
+        var reader  = new FileReader();
         var file = input.files[0];
+        
+        // Save data-URL for later
+        reader.addEventListener("load", function () {
+            self.upload_image.data_url = reader.result;
+        }, false);
+        
         if (file) {
             // First, gets an upload URL.
             console.log("Trying to get the upload url");
@@ -46,6 +57,9 @@ var app = function() {
                     req.open("PUT", put_url, true);
                     req.send(file);
                 });
+            
+            // Start reading file into data-URL
+            reader.readAsDataURL(file);
         }
     };
 
@@ -67,17 +81,25 @@ var app = function() {
                         image_url: get_url
                     },
                     function(data){
-                        //execute the below code after a brief delay to allow image upload to finish
+                        // Create new card
                         card = {}
                         card.card_id = data.id;
                         card.deck_id = data.deck_id;
                         card.deck_name = data.deck_name;
 
-                        setTimeout(function (uploaded_url) {
-                            card.card_image_url = get_url;
-                            self.vue.curr_cards.push(card);
-                            console.log(card)
-                        }, 1200)
+                        // Find best way to display image
+                        // Fall back to using image URL if the data-URL is not done in time
+                        if (self.upload_image.data_url == null) {
+                            self.upload_image.data_url = get_url;
+                            console.log("Data-URL not available in time, falling back to upload URL");
+                        }
+
+                        card.card_image_url = self.upload_image.data_url;
+                        self.vue.curr_cards.push(card);
+                        console.log(card)
+                        
+                        // Cleanup
+                        self.upload_image.data_url = null;
                     })
             }
         )
