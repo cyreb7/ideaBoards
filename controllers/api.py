@@ -61,13 +61,11 @@ def get_deck_name():
 @auth.requires_signature()
 def add_card():
     t_id = db.cards.insert(
-        deck_name = request.vars.deck_name,
         deck_id = request.vars.deck_id,
         card_image_url = request.vars.image_url
     )
     return response.json(dict(
         id = t_id,
-        deck_name = request.vars.deck_name,
         deck_id = request.vars.deck_id,
         card_image_url = request.vars.image_url
     ))
