@@ -51,18 +51,26 @@
               <div>
                 <div class="padded white">
                   <div id="uploader_div" v-if="d.is_uploading">
-                    Upload an image file: <input id="file_input" type="file" v-on:change="upload_file" accept="image/jpeg">
+                    Upload an image file: 
+                      <input id="file_input" type="file" accept="image/jpeg">
+                    Card Caption (optional): 
+                      <input id="caption_input">
+                    <!--Submit button will confirm upload-->
+                    <button v-on:click="upload_file" style="margin-top:20px;">Submit</button>
                   </div>
                   <button v-if="!d.is_uploading" v-on:click="open_uploader(d._idx)">add card</button>
                   <button v-if="d.is_uploading"  v-on:click="close_uploader(d._idx)">Cancel</button>
                   <div class="image_container" v-if="curr_cards.length>0">
                     <ul class="container">
                       <li v-for="image in curr_cards" style="margin-right:30px;">
-                        <p v-if="image.deck_id==d.id" class="card lifted padded quarter">
-                        <img v-bind:src="image.card_image_url" height="200px" width="200px" class="padded"/>
-                        <button v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
+                        <div v-if="image.deck_id==d.id">
+                          <p v-if="image.deck_id==d.id" class="card lifted padded quarter">
+                            <img v-bind:src="image.card_image_url" height="200px" width="200px" class="padded"/>
+                            <button v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
                             <i class="fa fa-trash fa-lg"></i></button>
-                        </p>
+                          </p>
+                          ${image.caption}
+                        </div>
                       </li> 
                     </ul>
                   </div>

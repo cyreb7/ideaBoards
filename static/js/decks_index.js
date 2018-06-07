@@ -15,7 +15,12 @@ var app = function() {
     var enumerate = function(v) { var k=0; return v.map(function(e) {e._idx = k++;});};
 
     self.open_uploader = function (idx) {
+        //clear file and caption inputs if any
         $("input#file_input").val("");
+        $("input#caption_input").val(""); 
+        for(var i=0; i<self.vue.curr_decks.length; i++){
+            self.vue.curr_decks[i].is_uploading = false;
+        }
         var deckid = self.vue.curr_decks[idx].id;
         self.vue.curr_decks[idx].is_uploading = true;
         //$("div#uploader_div").show();
@@ -34,14 +39,24 @@ var app = function() {
             var deckid = self.vue.curr_decks[idx];
             self.vue.curr_decks[idx].is_uploading = false;
         }
-        $("input#file_input").val(""); // This clears the file choice once uploaded.
+        //clear the file and caption inputs
+        $("input#file_input").val("");
+        $("input#caption_input").val(""); 
 
     };
 
     self.upload_file = function (event) {
         // Reads the file.
-        var input = event.target;
+
+        var input = $("input#file_input")[0];
         var file = input.files[0];
+        var caption = $("input#caption_input").val();
+        var reader  = new FileReader();
+        // Save data-URL for later
+        reader.addEventListener("load", function () {
+            self.upload_image.data_url = reader.result;
+        }, false);
+        
         if (file) {
             // First, gets an upload URL.
             console.log("Trying to get the upload url");
@@ -53,7 +68,7 @@ var app = function() {
                     console.log("Received upload url: " + put_url);
                     // Uploads the file, using the low-level interface.
                     var req = new XMLHttpRequest();
-                    req.addEventListener("load", self.upload_complete(get_url));
+                    req.addEventListener("load", self.upload_complete(get_url, caption));
                     // TODO: if you like, add a listener for "error" to detect failure.
                     req.open("PUT", put_url, true);
                     req.send(file);
@@ -61,7 +76,7 @@ var app = function() {
         }
     };
 
-    self.upload_complete = function(get_url) {
+    self.upload_complete = function(get_url, caption) {
         // Hides the uploader div.
         self.close_uploader(-1);
         console.log('The file was uploaded; it is now available at ' + get_url);
@@ -70,7 +85,8 @@ var app = function() {
         $.post(add_card_url,
         {
             deck_id: self.vue.open_deck_id,
-            image_url: get_url
+            image_url: get_url,
+            caption: caption
         },
             function(data){
                         //execute the below code after a brief delay to allow image upload to finish
@@ -78,12 +94,22 @@ var app = function() {
                 card.card_id = data.id;
                 card.deck_id = data.deck_id;
                 card.is_uploading = false;
-                setTimeout(function (uploaded_url) {
-                            card.card_image_url = get_url;
-                            self.vue.curr_cards.push(card);
-                            enumerate(self.vue.curr_cards);
-                            console.log(card);
-                        }, 1200)
+
+                card.caption = caption;
+
+                // Find best way to display image
+                // Fall back to using image URL if the data-URL is not done in time
+                if (self.upload_image.data_url == null) {
+                    self.upload_image.data_url = get_url;
+                    console.log("Data-URL not available in time, falling back to upload URL");
+                }
+                card.card_image_url = self.upload_image.data_url;
+                self.vue.curr_cards.push(card);
+                enumerate(self.vue.curr_cards);
+                console.log(card);
+                
+                // Cleanup
+                self.upload_image.data_url = null;
            }
         )
     };
@@ -129,7 +155,6 @@ var app = function() {
     self.get_cards = function(){
         $.get(show_cards_url,
             function (data) {
-                console.log(data);
                 self.vue.curr_cards = data;
             })
     }

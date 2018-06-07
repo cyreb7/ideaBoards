@@ -44,7 +44,8 @@ def show_cards():
         card_id = r.id,
         deck_id = r.deck_id,
         deck_name = r.deck_name,
-        card_image_url = r.card_image_url
+        card_image_url = r.card_image_url,
+        caption = r.caption
         )
 
         curr_cards.append(c)
@@ -62,7 +63,8 @@ def get_deck_name():
 def add_card():
     t_id = db.cards.insert(
         deck_id = request.vars.deck_id,
-        card_image_url = request.vars.image_url
+        card_image_url = request.vars.image_url,
+        caption = request.vars.caption
     )
     return response.json(dict(
         id = t_id,
@@ -85,6 +87,7 @@ def login_status():
 
 '''
 DEBUG: delete all decks for current user
+can also substitute decks with cards to delete all cards instead
 '''
 @auth.requires_signature()
 def delete_my_decks():
