@@ -17,14 +17,26 @@ var app = function() {
     // Enumerates an array.
     var enumerate = function(v) { var k=0; return v.map(function(e) {e._idx = k++;});};
 
-    self.open_uploader = function () {
-        $("div#uploader_div").show();
+    self.open_uploader = function (idx) {
+        $("input#file_input").val("");
+        var deckid = self.vue.curr_decks[idx].id;
+        self.vue.curr_decks[idx].is_uploading = true;
+        //$("div#uploader_div").show();
         self.vue.is_uploading = true;
+        self.vue.open_deck_id = deckid;
     };
 
-    self.close_uploader = function () {
-        $("div#uploader_div").hide();
-        self.vue.is_uploading = false;
+    self.close_uploader = function (idx) {
+        //$("div#uploader_div").hide();
+        if(idx == -1){
+            for(var i=0; i<self.vue.curr_decks.length; i++){
+                self.vue.curr_decks[i].is_uploading = false;
+            }
+        }
+        else{
+            var deckid = self.vue.curr_decks[idx];
+            self.vue.curr_decks[idx].is_uploading = false;
+        }
         $("input#file_input").val(""); // This clears the file choice once uploaded.
 
     };
@@ -65,43 +77,37 @@ var app = function() {
 
     self.upload_complete = function(get_url) {
         // Hides the uploader div.
-        self.close_uploader();
+        self.close_uploader(-1);
         console.log('The file was uploaded; it is now available at ' + get_url);
         self.vue.just_added = true;
         // The file is uploaded.  Now you have to insert the get_url into the database, etc.
-        $.post(get_deck_name_url,
-            {
-                deck_id: self.vue.open_deck_id
-            },
-            function(d_name){
-                $.post(add_card_url,
-                    {
-                        deck_name: d_name,
-                        deck_id: self.vue.open_deck_id,
-                        image_url: get_url
-                    },
-                    function(data){
-                        // Create new card
-                        card = {}
-                        card.card_id = data.id;
-                        card.deck_id = data.deck_id;
-                        card.deck_name = data.deck_name;
 
-                        // Find best way to display image
-                        // Fall back to using image URL if the data-URL is not done in time
-                        if (self.upload_image.data_url == null) {
-                            self.upload_image.data_url = get_url;
-                            console.log("Data-URL not available in time, falling back to upload URL");
-                        }
+        $.post(add_card_url,
+        {
+            deck_id: self.vue.open_deck_id,
+            image_url: get_url
+        },
+            function(data){
+                        //execute the below code after a brief delay to allow image upload to finish
+                card = {}
+                card.card_id = data.id;
+                card.deck_id = data.deck_id;
+                card.is_uploading = false;
 
-                        card.card_image_url = self.upload_image.data_url;
-                        self.vue.curr_cards.push(card);
-                        console.log(card)
-                        
-                        // Cleanup
-                        self.upload_image.data_url = null;
-                    })
-            }
+                // Find best way to display image
+                // Fall back to using image URL if the data-URL is not done in time
+                if (self.upload_image.data_url == null) {
+                    self.upload_image.data_url = get_url;
+                    console.log("Data-URL not available in time, falling back to upload URL");
+                }
+                card.card_image_url = self.upload_image.data_url;
+                self.vue.curr_cards.push(card);
+                enumerate(self.vue.curr_cards);
+                console.log(card);
+                
+                // Cleanup
+                self.upload_image.data_url = null;
+           }
         )
     };
 
@@ -138,27 +144,26 @@ var app = function() {
             },
             function (data) {
                 self.vue.just_added = false;
-                self.get_cards(self.vue.open_deck_id);
+                self.get_cards();
             })
     }
 
     //show cards belonging to the given deck
-    self.get_cards = function(deckid){
-        $.post(show_cards_url,
-            {
-                deckid: deckid
-            },
+    self.get_cards = function(){
+        $.get(show_cards_url,
             function (data) {
-                self.vue.open_deck_id = data.deck_id;
-                self.vue.open_deck_name = data.deck_name;
-                self.vue.show_decks = false;
-                self.vue.curr_cards = data.cards;
+                console.log(data);
+                self.vue.curr_cards = data;
             })
     }
 
     self.get_decks = function(){
         $.get(get_decks_url,
             function(decks){
+                for(var i=0; i<decks.length; i++){
+                    decks[i].is_uploading = false;
+                }
+                enumerate(decks);
                 self.vue.curr_decks = decks;
             }
         )
@@ -190,7 +195,6 @@ var app = function() {
             show_decks: true,
             is_uploading: false,
             open_deck_id: null,
-            open_deck_name: null,
             curr_decks: [],
             curr_cards: [],
             just_added: false
@@ -225,6 +229,7 @@ var app = function() {
                 //if user is logged in, get other users and store current user
                 if(self.vue.logged_in){
                     self.get_decks();
+                    self.get_cards();
                 }
             });
 
