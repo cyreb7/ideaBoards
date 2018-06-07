@@ -41,41 +41,36 @@
                 cancel
               </button>
         </div>
-        
-        <table class="fill" id="user_selector">
-            <!--show all other users-->
-            <tbody v-for="d in curr_decks">
-              <!--on click, show images of that user-->
-              <td v-on:click="get_cards(d.id)">${d.deck_name}</td>
-            </tbody>
-          </table>
-    </div>
-    <!--if a deck is selected, display all cards associated with the deck-->
-    <div v-else>
-      <button class="btn red" v-on:click="back_to_decks()">
-        back
-      </button>
-      <h2>The deck * ${open_deck_name} * was selected with an id of ${open_deck_id}</h2>
-      <!-- Code to upload files, with control buttons -->
-      <div id="uploader_div" style="display:none">
-        Upload an image file: <input id="file_input" type="file" v-on:change="upload_file" accept="image/jpeg">
-      </div>
-
-      <button v-if="!is_uploading" v-on:click="open_uploader">add card</button>
-      <button v-if="is_uploading"  v-on:click="close_uploader">Cancel</button>
-      <h3 v-if="curr_cards.length==0 && !just_added">You have no cards at the moment</h3>
-      <div v-else>
-        <div class="image_container">
-          <ul class="container">
-            <li v-for="image in curr_cards" class="card lifted padded quarter" style="margin-right:30px;">
-              <img v-bind:src="image.card_image_url" height="200px" width="200px" class="padded"/>
-              <button v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
-                  <i class="fa fa-trash fa-lg"></i></button>
-            </li> 
-          </ul>
-        </div>
-      </div>
-
+        <ul>
+          <li v-for="d in curr_decks">
+            <div class="accordion">
+              <!-- checkbox here is to keep the state of the accordion
+                its id must be unique and referened by the label -->
+              <input type="checkbox" v-bind:id="d.id">
+              <label v-bind:for="d.id"><a>${d.deck_name}</a></label>
+              <div>
+                <div class="padded white">
+                  <div id="uploader_div" style="display:none">
+                    Upload an image file: <input id="file_input" type="file" v-on:change="upload_file" accept="image/jpeg">
+                  </div>
+                  <button v-if="!is_uploading" v-on:click="open_uploader">add card</button>
+                  <button v-if="is_uploading"  v-on:click="close_uploader">Cancel</button>
+                  <div class="image_container" v-if="curr_cards.length>0">
+                    <ul class="container">
+                      <li v-for="image in curr_cards" class="card lifted padded quarter" style="margin-right:30px;">
+                        <p v-if="image.deck_id==d.id">
+                        <img v-bind:src="image.card_image_url" height="200px" width="200px" class="padded"/>
+                        <button v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
+                            <i class="fa fa-trash fa-lg"></i></button>
+                        </p>
+                      </li> 
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
     </div>
 
     <!--Some buttons for debugging-->

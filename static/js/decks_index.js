@@ -116,21 +116,16 @@ var app = function() {
             },
             function (data) {
                 self.vue.just_added = false;
-                self.get_cards(self.vue.open_deck_id);
+                self.get_cards();
             })
     }
 
     //show cards belonging to the given deck
-    self.get_cards = function(deckid){
-        $.post(show_cards_url,
-            {
-                deckid: deckid
-            },
+    self.get_cards = function(){
+        $.get(show_cards_url,
             function (data) {
-                self.vue.open_deck_id = data.deck_id;
-                self.vue.open_deck_name = data.deck_name;
-                self.vue.show_decks = false;
-                self.vue.curr_cards = data.cards;
+                console.log(data);
+                self.vue.curr_cards = data;
             })
     }
 
@@ -167,8 +162,6 @@ var app = function() {
             form_deck_name: null,
             show_decks: true,
             is_uploading: false,
-            open_deck_id: null,
-            open_deck_name: null,
             curr_decks: [],
             curr_cards: [],
             just_added: false
@@ -203,6 +196,7 @@ var app = function() {
                 //if user is logged in, get other users and store current user
                 if(self.vue.logged_in){
                     self.get_decks();
+                    self.get_cards();
                 }
             });
 
