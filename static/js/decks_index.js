@@ -184,6 +184,11 @@ var app = function() {
             })
     }
 
+    self.is_caption = function(is_caption){
+        if(is_caption == null || is_caption == "") return false;
+        return true;
+    }
+
     //DEBUG FUNCTION
     self.delete_my_decks = function(){
         $.get(delete_my_decks_url,
@@ -223,6 +228,7 @@ var app = function() {
             add_new_card: self.add_new_card,
             delete_card: self.delete_card,
 
+            is_caption: self.is_caption,
             //debug functions
             delete_my_decks: self.delete_my_decks
         }
