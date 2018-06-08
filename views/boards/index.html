@@ -1,6 +1,10 @@
 {{extend 'layout.html'}}
 
+<!-- Followed installation instructions and an example from here:
+http://learn.jquery.com/jquery-ui/getting-started/ -->
 {{block head}}
+<link rel="stylesheet" href="static/css/jquery-ui.css">
+<script src="static/js/jquery-ui.js"></script>
 <script>
     var my_url = "{{=URL('api', 'my_method')}}";
 </script>
@@ -8,6 +12,7 @@
 
 <div id="vue-div" class="display:none">
     <h2>Boards</h2>
+    <input type="text" name="date" id="date">
 </div>
 
 

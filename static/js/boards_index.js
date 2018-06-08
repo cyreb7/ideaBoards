@@ -11,6 +11,10 @@ var app = function() {
         }
     };
 
+    self.calendar = function(){
+        $( "#date" ).datepicker();
+    }
+
     // Complete as needed.
     self.vue = new Vue({
         el: "#vue-div",
@@ -19,11 +23,12 @@ var app = function() {
         data: {
         },
         methods: {
+            calender: self.calendar
         }
 
     });
 
-
+    self.calendar();
     return self;
 };
 
