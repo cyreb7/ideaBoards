@@ -17,22 +17,27 @@ var app = function() {
     // Enumerates an array.
     var enumerate = function(v) { var k=0; return v.map(function(e) {e._idx = k++;});};
 
+    /* Open up the uploader for a specific deck. If there is another uploader open,
+       close it to avoid confusion. */
     self.open_uploader = function (idx) {
         //clear file and caption inputs if any
         $("input#file_input").val("");
         $("input#caption_input").val(""); 
+        //close open uploader if any
         for(var i=0; i<self.vue.curr_decks.length; i++){
             self.vue.curr_decks[i].is_uploading = false;
         }
+        //set current deck as uploading
         var deckid = self.vue.curr_decks[idx].id;
         self.vue.curr_decks[idx].is_uploading = true;
-        //$("div#uploader_div").show();
-        self.vue.is_uploading = true;
+        //used to figure out what deck to associate our card-to-be to
         self.vue.open_deck_id = deckid;
     };
 
+    /*close the uploader. Since the uploader must also be closed upon
+      completion of uploading a file, an argument of -1 is used if we
+      dont know the deckid to simply close all uploading decks */
     self.close_uploader = function (idx) {
-        //$("div#uploader_div").hide();
         if(idx == -1){
             for(var i=0; i<self.vue.curr_decks.length; i++){
                 self.vue.curr_decks[i].is_uploading = false;
@@ -48,10 +53,9 @@ var app = function() {
 
     };
 
+    /*Uploads the file to a storage site. Upon completion, call upload_complete */
     self.upload_file = function (event) {
         // Reads the file.
-
-
         var input = $("input#file_input")[0];
         var file = input.files[0];
         var caption = $("input#caption_input").val();
@@ -84,13 +88,13 @@ var app = function() {
         }
     };
 
+    /*Given the url where the image of the card is hosted, add our card to the database and
+      then update our current Vue object*/
     self.upload_complete = function(get_url, caption) {
         // Hides the uploader div.
         self.close_uploader(-1);
         console.log('The file was uploaded; it is now available at ' + get_url);
-        self.vue.just_added = true;
-        // The file is uploaded.  Now you have to insert the get_url into the database, etc.
-
+        // Insert the card into the database
         $.post(add_card_url,
         {
             deck_id: self.vue.open_deck_id,
@@ -103,8 +107,6 @@ var app = function() {
                 card.card_id = data.id;
                 card.deck_id = data.deck_id;
                 card.is_uploading = false;
-
-
                 card.caption = caption;
 
                 // Find best way to display image
@@ -123,6 +125,20 @@ var app = function() {
            }
         )
     };
+
+    /*get all decks belonging to the signed in user*/
+    self.get_decks = function(){
+        $.get(get_decks_url,
+            function(decks){
+                //initialize all deck uploading status
+                for(var i=0; i<decks.length; i++){
+                    decks[i].is_uploading = false;
+                }
+                enumerate(decks);
+                self.vue.curr_decks = decks;
+            }
+        )
+    }
 
     //changes our vue boolean to true to allow user to create new deck
     self.add_new_deck = function(){
@@ -156,7 +172,6 @@ var app = function() {
                 card_id: cardid
             },
             function (data) {
-                self.vue.just_added = false;
                 self.get_cards();
             })
     }
@@ -167,23 +182,6 @@ var app = function() {
             function (data) {
                 self.vue.curr_cards = data;
             })
-    }
-
-    self.get_decks = function(){
-        $.get(get_decks_url,
-            function(decks){
-                for(var i=0; i<decks.length; i++){
-                    decks[i].is_uploading = false;
-                }
-                enumerate(decks);
-                self.vue.curr_decks = decks;
-            }
-        )
-    }
-
-    self.back_to_decks = function(){
-        self.vue.just_added = false;
-        self.vue.show_decks = true;
     }
 
     //DEBUG FUNCTION
@@ -202,49 +200,48 @@ var app = function() {
         delimiters: ['${', '}'],
         unsafeDelimiters: ['!{', '}'],
         data: {
-            adding_deck: false,
-            form_deck_name: null,
-            show_decks: true,
-            is_uploading: false,
-            open_deck_id: null,
-            curr_decks: [],
-            curr_cards: [],
-            just_added: false
+            adding_deck: false,     //determine if we are creating a new deck
+            form_deck_name: null,   //store the new deck name   
+            open_deck_id: null,     //store deckid of card we are uploading
+            curr_decks: [],         //storeall decks of signed in user
+            curr_cards: []          //store all cards of signed in user
         },
         methods: {
+            //functions related to image upload
             open_uploader: self.open_uploader,
             close_uploader: self.close_uploader,
             upload_file: self.upload_file,
 
+            //deck functions
             add_new_deck: self.add_new_deck,
             cancel_new_deck: self.cancel_new_deck,
             submit_new_deck: self.submit_new_deck,
-
             get_decks: self.get_decks,
-            get_cards: self.get_cards,
 
+            //card functions
+            get_cards: self.get_cards,
             add_new_card: self.add_new_card,
-            back_to_decks: self.back_to_decks,
             delete_card: self.delete_card,
+
             //debug functions
             delete_my_decks: self.delete_my_decks
         }
 
     });
 
-    //initialize values like login status and other user names
+    /*initialize values like login status, decks, and cards when user
+      first signs in*/
     var initialize = function(){
         $.get(login_status_url,
             function (user) {
                 //get login status
                 self.vue.logged_in = (user != null);
-                //if user is logged in, get other users and store current user
+                //if user is logged in, fetch user decks and cards
                 if(self.vue.logged_in){
                     self.get_decks();
                     self.get_cards();
                 }
             });
-
     }();        
 
     $("#vue-div").show();
