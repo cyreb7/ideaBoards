@@ -121,6 +121,7 @@ var app = function() {
                 
                 // Cleanup
                 self.upload_image.data_url = null;
+                self.vue.prev_deck_uploading = null;
            }
         )
     };
@@ -215,6 +216,8 @@ var app = function() {
                     deck_id: deckid
                 },
                 function (data) {
+                    self.vue.prev_deck_editing = null;
+                    self.vue.prev_deck_uploading = null;
                     self.get_decks();
                     self.get_cards();
                 });
@@ -289,6 +292,7 @@ var app = function() {
             get_cards: self.get_cards,
             add_new_card: self.add_new_card,
             delete_card: self.delete_card,
+            is_caption: self.is_caption,
 
             //debug functions
             delete_my_decks: self.delete_my_decks

@@ -5,8 +5,6 @@ import tempfile
 # Cloud-safe of uuid, so that many cloned servers do not all use the same uuids.
 from gluon.utils import web2py_uuid
 
-# Here go your api methods.
-
 '''
 insert a new deck into the database.
 '''
@@ -39,6 +37,9 @@ def delete_deck():
     db(db.cards.deck_id == request.vars.deck_id).delete()
 
 
+'''
+get all decks that belong to the signed in user
+'''
 @auth.requires_signature()
 def get_decks():
     curr_decks = []
@@ -76,6 +77,9 @@ def get_deck_name():
     return db(db.decks.id == request.vars.deck_id).select().first().deck_name
 
 
+'''
+add a card given a deckid, image, and optional caption
+'''
 @auth.requires_signature()
 def add_card():
     t_id = db.cards.insert(
@@ -89,6 +93,9 @@ def add_card():
         card_image_url = request.vars.image_url
     ))
 
+'''
+delete a card with the given id from the database
+'''
 @auth.requires_signature()
 def del_card():
     db(db.cards.id == request.vars.card_id).delete()

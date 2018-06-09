@@ -84,27 +84,27 @@
 
             <!--Container to show our images-->
             <div class="image_container" v-if="curr_cards.length>0">
-              <ul class="container">
+              <ul class="container float:none;">
                 <!--Iterate through our cards and only show cards that belong to the current deck-->
-                <li v-for="image in curr_cards" style="margin-right:30px; display: inline-block;">
-                  <div v-if="image.deck_id==d.id" style="width:100%;">
+                <li v-for="image in curr_cards" style=" display: inline-block; margin-bottom:30px;">
+                  <div v-if="image.deck_id==d.id" style="width:350px; margin-right:50px;">
                     <!--Each image is placed in a card-->
                     <div class="card lifted padded quarter" 
                          style="width:100%; height:250px; float: left;">
                       <img v-bind:src="image.card_image_url" height="200px" width="200px" 
                             class="padded"/>
                       <!--Delete button-->
+                      <br>
                       <button v-if="d.editing_deck" v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
                         <i class="fa fa-trash fa-lg"></i>
                       </button>
                       <button v-else style="margin-left: 20px; pointer-events: none; background-color: gray">
                         <i class="fa fa-trash fa-lg"></i>
                       </button>
+                      <!--display caption within image-->
+                      <p style="position: relative; bottom:220px; left:24px; text-shadow: 2px 2px black;
+                                width:150px; color:white;">${image.caption}</p>
                     </div>
-                    <br>
-                    <p style="width:140px; float:left; position:relative; bottom:100px;">
-                      ${image.caption}
-                    </p>
                   </div>
                 </li> 
               </ul>
