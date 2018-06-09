@@ -8,11 +8,24 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
 <script>
     var my_url = "{{=URL('api', 'my_method')}}";
 </script>
+<!-- Found out how to do rounded corners from here: https://www.w3schools.com/css/css3_borders.asp -->
+<style>#sampleCard{
+  width:150px;
+  height:175px;
+  border: 1.5px solid #0e0e0e;
+  padding:0.5em;
+  border-radius: 9px;
+  }
+</style>
 {{end}}
 
 <div id="vue-div" class="display:none">
     <h2>Boards</h2>
-    <input type="text" name="date" id="date">
+    <!-- This is based on the "Default funtionality" code from this site:
+    https://jqueryui.com/draggable/ -->
+    <div id="sampleCard" class="ui-widget-content">
+      <p> Sample Card </p>
+    </div>
 </div>
 
 

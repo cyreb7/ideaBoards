@@ -12,7 +12,7 @@ var app = function() {
     };
 
     self.calendar = function(){
-        $( "#date" ).datepicker();
+        $( "#sampleCard" ).draggable();
     }
 
     // Complete as needed.
