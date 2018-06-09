@@ -22,14 +22,15 @@ var app = function() {
     self.open_uploader = function (idx) {
         //clear file and caption inputs if any
         $("input#file_input").val("");
-        $("input#caption_input").val(""); 
+        $("input#caption_input").val("");
         //close open uploader if any
-        for(var i=0; i<self.vue.curr_decks.length; i++){
-            self.vue.curr_decks[i].is_uploading = false;
+        if(self.vue.prev_deck_uploading != null){
+            self.vue.curr_decks[self.vue.prev_deck_uploading].is_uploading = false;
         }
         //set current deck as uploading
         var deckid = self.vue.curr_decks[idx].id;
         self.vue.curr_decks[idx].is_uploading = true;
+        self.vue.prev_deck_uploading = idx;
         //used to figure out what deck to associate our card-to-be to
         self.vue.open_deck_id = deckid;
     };
@@ -38,10 +39,8 @@ var app = function() {
       completion of uploading a file, an argument of -1 is used if we
       dont know the deckid to simply close all uploading decks */
     self.close_uploader = function (idx) {
-        if(idx == -1){
-            for(var i=0; i<self.vue.curr_decks.length; i++){
-                self.vue.curr_decks[i].is_uploading = false;
-            }
+        if(idx == -1 && self.vue.prev_deck_uploading != null){
+            self.vue.curr_decks[self.vue.prev_deck_uploading].is_uploading = false;
         }
         else{
             var deckid = self.vue.curr_decks[idx];
@@ -49,7 +48,7 @@ var app = function() {
         }
         //clear the file and caption inputs
         $("input#file_input").val("");
-        $("input#caption_input").val(""); 
+        $("input#caption_input").val("");
 
     };
 
@@ -133,6 +132,7 @@ var app = function() {
                 //initialize all deck uploading status
                 for(var i=0; i<decks.length; i++){
                     decks[i].is_uploading = false;
+                    decks[i].editing_deck = false;
                 }
                 enumerate(decks);
                 self.vue.curr_decks = decks;
@@ -142,6 +142,7 @@ var app = function() {
 
     //changes our vue boolean to true to allow user to create new deck
     self.add_new_deck = function(){
+        self.vue.form_deck_name = null;
         self.vue.adding_deck = true;
     }
 
@@ -158,14 +159,69 @@ var app = function() {
                 deck_name: self.vue.form_deck_name
             },
             function (data) {
-                self.vue.curr_decks.push(data);
+                var deck = data;
+                deck.editing_deck = false;
+                deck.is_uploading = false;
+                self.vue.curr_decks.push(deck);
+                enumerate(self.vue.curr_decks);
+                
+                self.vue.form_deck_name = null;
+                self.vue.adding_deck = false;
             });
 
-        //upon completion, set view back to normal
-        self.vue.form_deck_name = null;
-        self.vue.adding_deck = false;
     }
 
+    /*Start editing a deck */
+    self.edit_deck = function(idx){
+        if(self.vue.prev_deck_editing != null){
+            self.vue.curr_decks[self.vue.prev_deck_editing].editing_deck = false;
+        }
+        self.vue.curr_decks[idx].editing_deck = true;
+        self.vue.prev_deck_editing = idx;
+        self.vue.form_deck_name = self.vue.curr_decks[idx].deck_name;
+
+    }
+
+    /*Cancel edits. Note that at the moment, card deletes are still PERMANANT */
+    self.cancel_deck_edit = function(idx){
+        self.vue.curr_decks[idx].editing_deck = false;
+        self.vue.prev_deck_editing = null;
+    }
+
+    /*Submit the edit, and change the deck name to what is specified */
+    self.submit_deck_edit = function(idx){
+        var deckid = self.vue.curr_decks[idx].id;
+        var new_deck_name = self.vue.form_deck_name;
+        $.post(edit_deck_url,
+            {
+                deck_id: deckid,
+                deck_name: new_deck_name
+            },
+            function (data) {
+                self.vue.curr_decks[idx].deck_name = data;
+                self.vue.curr_decks[idx].editing_deck = false;
+                self.vue.prev_deck_editing = null;
+            });
+    }
+
+    /*delete a deck and all cards associated with it */
+    self.delete_deck = function(idx){
+        var question = "Warning: this will delete all cards associated with this deck. Do you wish to proceed?";
+        var continue_del = confirm(question);
+        if(continue_del){
+            var deckid = self.vue.curr_decks[idx].id;
+            $.post(delete_deck_url,
+                {
+                    deck_id: deckid
+                },
+                function (data) {
+                    self.get_decks();
+                    self.get_cards();
+                });
+        }
+    }
+
+    /*delete the card with the following cardid */
     self.delete_card = function(cardid){
         $.post(del_card_url,
             {
@@ -184,6 +240,12 @@ var app = function() {
             })
     }
 
+    //determine if a card has a caption
+    self.is_caption = function(is_caption){
+        if(is_caption == null || is_caption == "") return false;
+        return true;
+    }
+
     //DEBUG FUNCTION
     self.delete_my_decks = function(){
         $.get(delete_my_decks_url,
@@ -192,7 +254,6 @@ var app = function() {
             }
         )
     }
-
 
     //our vue object
     self.vue = new Vue({
@@ -204,7 +265,9 @@ var app = function() {
             form_deck_name: null,   //store the new deck name   
             open_deck_id: null,     //store deckid of card we are uploading
             curr_decks: [],         //storeall decks of signed in user
-            curr_cards: []          //store all cards of signed in user
+            curr_cards: [],          //store all cards of signed in user
+            prev_deck_uploading: null,
+            prev_deck_editing: null
         },
         methods: {
             //functions related to image upload
@@ -216,7 +279,11 @@ var app = function() {
             add_new_deck: self.add_new_deck,
             cancel_new_deck: self.cancel_new_deck,
             submit_new_deck: self.submit_new_deck,
+            edit_deck: self.edit_deck,
             get_decks: self.get_decks,
+            cancel_deck_edit: self.cancel_deck_edit,
+            submit_deck_edit: self.submit_deck_edit,
+            delete_deck: self.delete_deck,
 
             //card functions
             get_cards: self.get_cards,

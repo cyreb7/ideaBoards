@@ -16,11 +16,28 @@ def add_deck():
         #add url, all other fields are set by default
         deck_name = request.vars.deck_name
     )
-    return response.json(dict(
-        id = t_id,
-        deck_name = request.vars.deck_name,
-        user_email = auth.user.email
-    ))
+    entry = db(db.decks.id == t_id).select().first()
+    return response.json(entry)
+
+'''
+edit the name of the deck
+'''
+@auth.requires_signature()
+def edit_deck():
+    deckid = request.vars.deck_id
+    newname = request.vars.deck_name
+    entry = db(db.decks.id == deckid).select().first()
+    entry.update_record(deck_name=newname)
+    return newname
+
+'''
+remove the deck and all associated cards from the db
+'''
+@auth.requires_signature()
+def delete_deck():
+    db(db.decks.id == request.vars.deck_id).delete()
+    db(db.cards.deck_id == request.vars.deck_id).delete()
+
 
 @auth.requires_signature()
 def get_decks():

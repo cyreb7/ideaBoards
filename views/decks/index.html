@@ -3,13 +3,16 @@
 {{block head}}
 <script>
     var login_status_url = "{{=URL('api', 'login_status', user_signature=True)}}";
+    var get_deck_name_url = "{{=URL('api', 'get_deck_name', user_signature=True)}}";
     var add_deck_url = "{{=URL('api', 'add_deck', user_signature=True)}}";
     var get_decks_url = "{{=URL('api', 'get_decks', user_signature=True)}}";
+    var edit_deck_url = "{{=URL('api', 'edit_deck', user_signature=True)}}";
+    var delete_deck_url = "{{=URL('api', 'delete_deck', user_signature=True)}}";
+
     var add_card_url = "{{=URL('api', 'add_card', user_signature=True)}}";
     var del_card_url = "{{=URL('api', 'del_card', user_signature=True)}}";
     var show_cards_url = "{{=URL('api', 'show_cards', user_signature=True)}}";
 
-    var get_deck_name_url = "{{=URL('api', 'get_deck_name', user_signature=True)}}";
     var delete_my_decks_url = "{{=URL('api', 'delete_my_decks', user_signature=True)}}";
 </script>
 {{end}}
@@ -40,6 +43,7 @@
       cancel
     </button>
   </div>
+  <br>
 
   <!--show a list of decks belonging to a user-->
   <ul>
@@ -62,8 +66,21 @@
               <button v-on:click="close_uploader(d._idx)">Cancel</button>
             </div>
             <!--othewise show corresponding button to show uploader for this deck-->
-            <button v-if="!d.is_uploading" v-on:click="open_uploader(d._idx)">add card</button>
-            <br><br>
+            <div  v-if="!d.is_uploading && !d.editing_deck">
+              <button v-on:click="open_uploader(d._idx)">add card</button>
+              <button v-on:click="edit_deck(d._idx)">edit deck</button>
+            </div>
+            <div v-if="d.editing_deck && !d.adding_deck">
+              <button v-on:click="submit_deck_edit(d._idx)">submit</button>
+              <button v-on:click="cancel_deck_edit(d._idx)">cancel</button>
+              <button v-on:click="delete_deck(d._idx)" 
+                      style="float:right; background-color: crimson">
+                delete deck
+              </button>
+              <input id="deck_name"
+                  v-model="form_deck_name" placeholder="New Deck Name" type="text" />
+            </div>
+            <br>
 
             <!--Container to show our images-->
             <div class="image_container" v-if="curr_cards.length>0">
@@ -71,14 +88,23 @@
                 <!--Iterate through our cards and only show cards that belong to the current deck-->
                 <li v-for="image in curr_cards" style="margin-right:30px; display: inline-block;">
                   <div v-if="image.deck_id==d.id" style="width:100%;">
-                    <div class="card lifted padded quarter" style="width:100%;">
-                      <img v-bind:src="image.card_image_url" height="200px" width="200px" class="padded"/>
-                      <button v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
+                    <!--Each image is placed in a card-->
+                    <div class="card lifted padded quarter" 
+                         style="width:100%; height:250px; float: left;">
+                      <img v-bind:src="image.card_image_url" height="200px" width="200px" 
+                            class="padded"/>
+                      <!--Delete button-->
+                      <button v-if="d.editing_deck" v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
+                        <i class="fa fa-trash fa-lg"></i>
+                      </button>
+                      <button v-else style="margin-left: 20px; pointer-events: none; background-color: gray">
                         <i class="fa fa-trash fa-lg"></i>
                       </button>
                     </div>
                     <br>
-                    ${image.caption}
+                    <p style="width:140px; float:left; position:relative; bottom:100px;">
+                      ${image.caption}
+                    </p>
                   </div>
                 </li> 
               </ul>
