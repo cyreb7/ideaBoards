@@ -95,9 +95,16 @@
                             class="padded"/>
                       <!--Delete button-->
                       <br>
-                      <button v-if="d.editing_deck" v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
-                        <i class="fa fa-trash fa-lg"></i>
-                      </button>
+                      <p v-if="d.editing_deck">
+                        <button v-if="!is_delete_card(image._idx)" v-on:click="toggle_delete_card(image._idx)" 
+                                style="margin-left: 20px;">
+                          <i class="fa fa-trash fa-lg"></i>
+                        </button>
+                        <button v-else v-on:click="toggle_delete_card(image._idx)" 
+                                style="margin-left: 20px; background-color: crimson;">
+                                <i class="fa">deleting</i>
+                        </button>
+                      </p>
                       <button v-else style="margin-left: 20px; pointer-events: none; background-color: gray">
                         <i class="fa fa-trash fa-lg"></i>
                       </button>

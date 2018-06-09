@@ -181,6 +181,10 @@ var app = function() {
         self.vue.prev_deck_editing = idx;
         self.vue.form_deck_name = self.vue.curr_decks[idx].deck_name;
 
+        for(var i=0; i<self.vue.curr_cards.length; i++){
+            self.vue.curr_cards[i].is_deleting = false;
+        }
+
     }
 
     /*Cancel edits. Note that at the moment, card deletes are still PERMANANT */
@@ -191,23 +195,41 @@ var app = function() {
 
     /*Submit the edit, and change the deck name to what is specified */
     self.submit_deck_edit = function(idx){
+        var continue_del = true;
+
+        if(self.vue.delete_cart.length > 0){
+            var question = "The below " + self.vue.delete_cart.length + " card(s) will be deleted. Proceed?";
+            continue_del = confirm(question);
+            if(continue_del){
+                for(var i=0; i<self.vue.delete_cart.length; i++){
+                    var card_idx = self.vue.delete_cart[i];
+                    var card_id = self.vue.curr_cards[card_idx].card_id;
+                    self.delete_card(card_id);
+                }
+            }
+        }
+
         var deckid = self.vue.curr_decks[idx].id;
         var new_deck_name = self.vue.form_deck_name;
-        $.post(edit_deck_url,
-            {
-                deck_id: deckid,
-                deck_name: new_deck_name
-            },
-            function (data) {
-                self.vue.curr_decks[idx].deck_name = data;
-                self.vue.curr_decks[idx].editing_deck = false;
-                self.vue.prev_deck_editing = null;
-            });
+
+        if(continue_del){
+            $.post(edit_deck_url,
+                {
+                    deck_id: deckid,
+                    deck_name: new_deck_name
+                },
+                function (data) {
+                    self.vue.curr_decks[idx].deck_name = data;
+                    self.vue.curr_decks[idx].editing_deck = false;
+                    self.vue.prev_deck_editing = null;
+                });
+        }
     }
 
     /*delete a deck and all cards associated with it */
     self.delete_deck = function(idx){
-        var question = "Warning: this will delete all cards associated with this deck. Do you wish to proceed?";
+        var question = "Warning: this will also delete all cards associated with this deck. " + 
+                       "Do you wish to proceed?";
         var continue_del = confirm(question);
         if(continue_del){
             var deckid = self.vue.curr_decks[idx].id;
@@ -239,8 +261,27 @@ var app = function() {
     self.get_cards = function(){
         $.get(show_cards_url,
             function (data) {
+                enumerate(data);
                 self.vue.curr_cards = data;
             })
+    }
+
+    self.toggle_delete_card = function(idx){
+        var del = self.vue.curr_cards[idx].is_deleting;
+        if(del){
+            for(var i=0; i<self.vue.delete_cart.length; i++ ){
+                if(self.vue.delete_cart[i] == idx){
+                    self.vue.delete_cart.splice(i, 1);
+                    break;
+                }
+            }
+        }
+        else self.vue.delete_cart.push(idx);
+        self.vue.curr_cards[idx].is_deleting = !self.vue.curr_cards[idx].is_deleting;
+    }
+
+    self.is_delete_card = function(idx){
+        return self.vue.delete_cart.indexOf(idx) != -1;
     }
 
     //determine if a card has a caption
@@ -269,6 +310,7 @@ var app = function() {
             open_deck_id: null,     //store deckid of card we are uploading
             curr_decks: [],         //storeall decks of signed in user
             curr_cards: [],          //store all cards of signed in user
+            delete_cart: [],
             prev_deck_uploading: null,
             prev_deck_editing: null
         },
@@ -292,6 +334,8 @@ var app = function() {
             get_cards: self.get_cards,
             add_new_card: self.add_new_card,
             delete_card: self.delete_card,
+            toggle_delete_card: self.toggle_delete_card,
+            is_delete_card: self.is_delete_card,
             is_caption: self.is_caption,
 
             //debug functions
