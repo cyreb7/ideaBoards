@@ -4,7 +4,7 @@ h1 {
   margin-top: 0;
 }
 
-/* line 8, ../sass/_main.scss */
+/* line 9, ../sass/_main.scss */
 .tagline {
   font-size: 1.4em;
   border-bottom: 3px solid black;
@@ -12,9 +12,32 @@ h1 {
   padding-bottom: 0;
 }
 
-/* line 16, ../sass/_main.scss */
+/* line 17, ../sass/_main.scss */
 .subtitle {
   margin-top: 0;
   font-style: italic;
   font-size: 1.8em;
+}
+
+/* line 23, ../sass/_main.scss */
+.bottom-border {
+  border-bottom: 3px solid black;
+  margin-bottom: 1em;
+}
+
+/* line 29, ../sass/_main.scss */
+.idea-card {
+  position: relative;
+}
+/* line 39, ../sass/_main.scss */
+.idea-card span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: white;
+  text-shadow: 0px 0px 3px black, 1px 1px 1px black;
+  word-break: break-word;
 }

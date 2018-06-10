@@ -57,77 +57,89 @@
         <input type="checkbox" v-bind:id="d.id">
         <label v-bind:for="d.id"><a>${d.deck_name}</a></label>
         <div>
-          <div class="padded white">
-            <!--Show the uploader if user is currently uploading card to this deck-->
-            <div id="uploader_div" v-if="d.is_uploading">
-              Upload an image file: 
-                <input id="file_input" type="file" accept="image/jpeg">
-              Card Caption (optional): 
-                <input id="caption_input">
-              <!--Submit button will confirm upload, Cancel will go back-->
-              <button v-on:click="upload_file" style="margin-top:20px;">Submit</button>
-              <button v-on:click="close_uploader(d._idx)">Cancel</button>
+          <div class="padded container">
+            
+            <!-- Uploading buttons and stuff -->
+            <div class="padded">
+              <!-- Edit buttons -->
+              <div class="bottom-border">
+                <!-- Adding card -->
+                <button v-if="!d.is_uploading && !(d.editing_deck && !adding_deck)" v-on:click="open_uploader(d._idx)">Add Card</button>
+                <button v-if="d.is_uploading" v-on:click="close_uploader(d._idx)">Cancel</button>
+                
+                <!-- Editing deck -->
+                <button v-if="!d.is_uploading && !(d.editing_deck && !adding_deck)" v-on:click="edit_deck(d._idx)">Edit Deck</button>
+                <button v-if="d.editing_deck && !adding_deck" v-on:click="cancel_deck_edit(d._idx)">Cancel</button>
+              </div>
+              
+              <!--Show the uploader if user is currently uploading card to this deck-->
+              <div id="uploader_div" v-if="d.is_uploading">
+                <label>
+                  Upload an image file: 
+                  <input id="file_input" type="file" accept="image/jpeg">
+                </label>
+                
+                <label>
+                  Card Caption (optional): 
+                  <input id="caption_input">
+                </label>
+                
+                <!--Submit button will confirm upload, Cancel will go back-->
+                <button v-on:click="upload_file">Submit</button>
+              </div>
+              
+              <!--if user is editing a deck show the below-->
+              <div v-if="d.editing_deck && !adding_deck">
+                <input id="deck_name"
+                    v-model="form_deck_name" placeholder="New Deck Name" type="text" />
+                <button v-on:click="submit_deck_edit(d._idx)">submit</button>
+                <button v-on:click="delete_deck(d._idx)" 
+                        style="float:right; background-color: crimson">
+                  delete deck
+                </button>
+              </div>
             </div>
-            <!--If user is not editing decks, give the below options: add and edit-->
-            <div  v-if="!d.is_uploading && !d.editing_deck">
-              <button v-on:click="open_uploader(d._idx)">add card</button>
-              <button v-on:click="edit_deck(d._idx)">edit deck</button>
-            </div>
-            <!--if user is editing a deck show the below-->
-            <div v-if="d.editing_deck && !adding_deck">
-              <button v-on:click="submit_deck_edit(d._idx)">submit</button>
-              <button v-on:click="cancel_deck_edit(d._idx)">cancel</button>
-              <button v-on:click="delete_deck(d._idx)" 
-                      style="float:right; background-color: crimson">
-                delete deck
-              </button>
-              <input id="deck_name"
-                  v-model="form_deck_name" placeholder="New Deck Name" type="text" />
-            </div>
-            <br>
+
 
             <!--Container to show our images-->
             <div class="image_container" v-if="curr_cards.length>0">
-              <ul class="container float:none;">
+              <ul class="container">
+                
                 <!--Iterate through our cards and only show cards that belong to the current deck-->
-                <li v-for="image in curr_cards" style=" display: inline-block; margin-bottom:10px;">
-                  <div v-if="image.deck_id==d.id" style="width:300px; height: 330px; margin-right:50px;">
-                    <!--Each image is placed in a card-->
-                    <div class="card lifted padded quarter" 
-                         style="width:100%; height:300px; float: left;">
-                      <img v-bind:src="image.card_image_url" height="230px" width="220px;" 
-                            class="padded"/>
-                      <br>
+                <li v-for="image in curr_cards" class="quarter">
+                  <div v-if="image.deck_id==d.id">
+                    <div>
+                      
+                      <!--Each image is placed in a card-->
+                      <p class="idea-card lifted">
+                        <img v-bind:src="image.card_image_url"/>
+                        <!--Display text within image-->
+                        <span class="padded">${image.caption}</span>
+                      </p>
+                      
                       <!--positioning if we are editing-->
-                      <pp v-if="d.editing_deck">
+                      <div v-if="d.editing_deck">
                         <!--allow editing of card caption. Placed under image for ease in reading-->
-                        <input style="position: relative; bottom:20px;" v-model="image.caption"
+                        <input placeholder="Card text" v-model="image.caption"
                           v-on:blur="edit_caption(image._idx)" type="text">
                         <!--if we are not deleting this card yet, show a trash can-->
-                        <button v-if="!is_delete_card(image._idx)" v-on:click="toggle_delete_card(image._idx)" 
-                                style="margin-left: 20px;">
+                        <button v-if="!is_delete_card(image._idx)" v-on:click="toggle_delete_card(image._idx)">
                           <i class="fa fa-trash fa-lg"></i>
                         </button>
                         <!--If this card is to be deleted, show a red deleting button-->
                         <button v-else v-on:click="toggle_delete_card(image._idx)" 
-                                style="margin-left: 20px; background-color: crimson;">
+                                style="background-color: crimson;">
                                 <i class="fa">deleting</i>
                         </button>
-                        <!--position the caption within the image-->
-                        <p style="position: relative; bottom:276px; left:24px; text-shadow: 2px 2px black;
-                                  width:150px; color:white;">${image.caption}
-                        </p>
-                      </pp>
+                      </div>
+                      
                       <!--positioning if we are not editing-->
-                      <pp v-if="!d.editing_deck">
-                        <button style="margin-left: 20px; pointer-events: none; background-color: gray">
+                      <div v-if="!d.editing_deck">
+                        <button style="pointer-events: none; background-color: gray">
                           <i class="fa fa-trash fa-lg"></i>
                         </button>
-                        <!--display caption within image-->
-                        <p style="position: relative; bottom:250px; left:24px; text-shadow: 2px 2px black;
-                                  width:150px; color:white;">${image.caption}
                         </p>
-                      </pp>
+                      </div>
                     </div>
                   </div>
                 </li> 
