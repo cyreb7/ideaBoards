@@ -5,8 +5,6 @@ import tempfile
 # Cloud-safe of uuid, so that many cloned servers do not all use the same uuids.
 from gluon.utils import web2py_uuid
 
-# Here go your api methods.
-
 '''
 insert a new deck into the database.
 '''
@@ -16,12 +14,32 @@ def add_deck():
         #add url, all other fields are set by default
         deck_name = request.vars.deck_name
     )
-    return response.json(dict(
-        id = t_id,
-        deck_name = request.vars.deck_name,
-        user_email = auth.user.email
-    ))
+    entry = db(db.decks.id == t_id).select().first()
+    return response.json(entry)
 
+'''
+edit the name of the deck
+'''
+@auth.requires_signature()
+def edit_deck():
+    deckid = request.vars.deck_id
+    newname = request.vars.deck_name
+    entry = db(db.decks.id == deckid).select().first()
+    entry.update_record(deck_name=newname)
+    return newname
+
+'''
+remove the deck and all associated cards from the db
+'''
+@auth.requires_signature()
+def delete_deck():
+    db(db.decks.id == request.vars.deck_id).delete()
+    db(db.cards.deck_id == request.vars.deck_id).delete()
+
+
+'''
+get all decks that belong to the signed in user
+'''
 @auth.requires_signature()
 def get_decks():
     curr_decks = []
@@ -59,6 +77,9 @@ def get_deck_name():
     return db(db.decks.id == request.vars.deck_id).select().first().deck_name
 
 
+'''
+add a card given a deckid, image, and optional caption
+'''
 @auth.requires_signature()
 def add_card():
     t_id = db.cards.insert(
@@ -72,10 +93,22 @@ def add_card():
         card_image_url = request.vars.image_url
     ))
 
+'''
+delete a card with the given id from the database
+'''
 @auth.requires_signature()
 def del_card():
     db(db.cards.id == request.vars.card_id).delete()
     return "done"
+
+'''
+update the caption of the card with the given card_id
+'''
+def update_caption():
+    card_id = request.vars.card_id
+    newcaption = request.vars.caption
+    entry = db(db.cards.id == card_id).select().first()
+    entry.update_record(caption=newcaption)
 
 '''
 get login status. return user first name if they are signed in

@@ -2,14 +2,20 @@
 
 {{block head}}
 <script>
+  //determine if user is signed in
     var login_status_url = "{{=URL('api', 'login_status', user_signature=True)}}";
+  //urls for managing our decks
+    var get_deck_name_url = "{{=URL('api', 'get_deck_name', user_signature=True)}}";
     var add_deck_url = "{{=URL('api', 'add_deck', user_signature=True)}}";
     var get_decks_url = "{{=URL('api', 'get_decks', user_signature=True)}}";
+    var edit_deck_url = "{{=URL('api', 'edit_deck', user_signature=True)}}";
+    var delete_deck_url = "{{=URL('api', 'delete_deck', user_signature=True)}}";
+  //urls for managing our cards
     var add_card_url = "{{=URL('api', 'add_card', user_signature=True)}}";
     var del_card_url = "{{=URL('api', 'del_card', user_signature=True)}}";
     var show_cards_url = "{{=URL('api', 'show_cards', user_signature=True)}}";
-
-    var get_deck_name_url = "{{=URL('api', 'get_deck_name', user_signature=True)}}";
+    var update_caption_url = "{{=URL('api', 'update_caption', user_signature=True)}}";
+  //urls for debugging purposes
     var delete_my_decks_url = "{{=URL('api', 'delete_my_decks', user_signature=True)}}";
 </script>
 {{end}}
@@ -40,6 +46,7 @@
       cancel
     </button>
   </div>
+  <br>
 
   <!--show a list of decks belonging to a user-->
   <ul>
@@ -50,35 +57,89 @@
         <input type="checkbox" v-bind:id="d.id">
         <label v-bind:for="d.id"><a>${d.deck_name}</a></label>
         <div>
-          <div class="padded white">
-            <!--Show the uploader if user is currently uploading card to this deck-->
-            <div id="uploader_div" v-if="d.is_uploading">
-              Upload an image file: 
-                <input id="file_input" type="file" accept="image/jpeg">
-              Card Caption (optional): 
-                <input id="caption_input">
-              <!--Submit button will confirm upload, Cancel will go back-->
-              <button v-on:click="upload_file" style="margin-top:20px;">Submit</button>
-              <button v-on:click="close_uploader(d._idx)">Cancel</button>
+          <div class="padded container">
+            
+            <!-- Uploading buttons and stuff -->
+            <div class="padded">
+              <!-- Edit buttons -->
+              <div class="bottom-border">
+                <!-- Adding card -->
+                <button v-if="!d.is_uploading && !(d.editing_deck && !adding_deck)" v-on:click="open_uploader(d._idx)">Add Card</button>
+                <button v-if="d.is_uploading" v-on:click="close_uploader(d._idx)">Cancel</button>
+                
+                <!-- Editing deck -->
+                <button v-if="!d.is_uploading && !(d.editing_deck && !adding_deck)" v-on:click="edit_deck(d._idx)">Edit Deck</button>
+                <button v-if="d.editing_deck && !adding_deck" v-on:click="cancel_deck_edit(d._idx)">Cancel</button>
+              </div>
+              
+              <!--Show the uploader if user is currently uploading card to this deck-->
+              <div id="uploader_div" v-if="d.is_uploading">
+                <label>
+                  Upload an image file: 
+                  <input id="file_input" type="file" accept="image/jpeg">
+                </label>
+                
+                <label>
+                  Card Caption (optional): 
+                  <input id="caption_input">
+                </label>
+                
+                <!--Submit button will confirm upload, Cancel will go back-->
+                <button v-on:click="upload_file">Submit</button>
+              </div>
+              
+              <!--if user is editing a deck show the below-->
+              <div v-if="d.editing_deck && !adding_deck">
+                <input id="deck_name"
+                    v-model="form_deck_name" placeholder="New Deck Name" type="text" />
+                <button v-on:click="submit_deck_edit(d._idx)">submit</button>
+                <button v-on:click="delete_deck(d._idx)" 
+                        style="float:right; background-color: crimson">
+                  delete deck
+                </button>
+              </div>
             </div>
-            <!--othewise show corresponding button to show uploader for this deck-->
-            <button v-if="!d.is_uploading" v-on:click="open_uploader(d._idx)">add card</button>
-            <br><br>
+
 
             <!--Container to show our images-->
             <div class="image_container" v-if="curr_cards.length>0">
               <ul class="container">
+                
                 <!--Iterate through our cards and only show cards that belong to the current deck-->
-                <li v-for="image in curr_cards" style="margin-right:30px; display: inline-block;">
-                  <div v-if="image.deck_id==d.id" style="width:100%;">
-                    <div class="card lifted padded quarter" style="width:100%;">
-                      <img v-bind:src="image.card_image_url" height="200px" width="200px" class="padded"/>
-                      <button v-on:click="delete_card(image.card_id)" style="margin-left: 20px;">
-                        <i class="fa fa-trash fa-lg"></i>
-                      </button>
+                <li v-for="image in curr_cards" v-if="image.deck_id==d.id" class="quarter">
+                  <div>
+                    <div>
+                      
+                      <!--Each image is placed in a card-->
+                      <p class="idea-card lifted">
+                        <img v-bind:src="image.card_image_url"/>
+                        <!--Display text within image-->
+                        <span class="padded">${image.caption}</span>
+                      </p>
+                      
+                      <!--positioning if we are editing-->
+                      <div v-if="d.editing_deck">
+                        <!--allow editing of card caption. Placed under image for ease in reading-->
+                        <input placeholder="Card text" v-model="image.caption"
+                          v-on:blur="edit_caption(image._idx)" type="text">
+                        <!--if we are not deleting this card yet, show a trash can-->
+                        <button v-if="!is_delete_card(image._idx)" v-on:click="toggle_delete_card(image._idx)">
+                          <i class="fa fa-trash fa-lg"></i>
+                        </button>
+                        <!--If this card is to be deleted, show a red deleting button-->
+                        <button v-else v-on:click="toggle_delete_card(image._idx)" 
+                                style="background-color: crimson;">
+                                <i class="fa">deleting</i>
+                        </button>
+                      </div>
+                      
+                      <!--positioning if we are not editing-->
+                      <div v-if="!d.editing_deck">
+                        <button style="pointer-events: none; background-color: gray">
+                          <i class="fa fa-trash fa-lg"></i>
+                        </button>
+                      </div>
                     </div>
-                    <br>
-                    ${image.caption}
                   </div>
                 </li> 
               </ul>
@@ -104,3 +165,16 @@
 {{pass}}
 
 <script src="{{=URL('static', 'js/decks_index.js')}}"></script>
+<script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyBzWmOD4FCZYKV51zRBy5iiTLCzc8-qtJ0",
+    authDomain: "ideaboards-87017.firebaseapp.com",
+    databaseURL: "https://ideaboards-87017.firebaseio.com",
+    projectId: "ideaboards-87017",
+    storageBucket: "ideaboards-87017.appspot.com",
+    messagingSenderId: "387375900360"
+  };
+  firebase.initializeApp(config);
+</script>

@@ -316,7 +316,9 @@ a:not(.btn):not(.noeffect):after {
 .accordion>input:checked ~ label:before {content:"\25bc"; color:#ddd}
 .accordion>input {display:none}
 .accordion>input:checked ~ *:not(label) {
-  max-height: 1000px !important;
+  /* No idea why this limits the height
+  max-height: 1000px !important;*/
+  max-height: initial !important;
   overflow:hidden !important;
   -webkit-transition: max-height .3s ease-in;
   transition: max-height .3s ease-in;
