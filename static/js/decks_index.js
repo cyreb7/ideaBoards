@@ -17,6 +17,12 @@ var app = function() {
     // Enumerates an array.
     var enumerate = function(v) { var k=0; return v.map(function(e) {e._idx = k++;});};
 
+/*
+------------------------------------------------------------------------------------
+handle card uploader
+------------------------------------------------------------------------------------
+*/
+
     /* Open up the uploader for a specific deck. If there is another uploader open,
        close it to avoid confusion. */
     self.open_uploader = function (idx) {
@@ -102,7 +108,7 @@ var app = function() {
         },
             function(data){
                         //execute the below code after a brief delay to allow image upload to finish
-                card = {}
+                card = {};
                 card.card_id = data.id;
                 card.deck_id = data.deck_id;
                 card.is_uploading = false;
@@ -126,6 +132,12 @@ var app = function() {
         )
     };
 
+/*
+------------------------------------------------------------------------------------
+deck function
+------------------------------------------------------------------------------------
+*/
+
     /*get all decks belonging to the signed in user*/
     self.get_decks = function(){
         $.get(get_decks_url,
@@ -143,8 +155,15 @@ var app = function() {
 
     //changes our vue boolean to true to allow user to create new deck
     self.add_new_deck = function(){
+        //clear any form data
         self.vue.form_deck_name = null;
         self.vue.adding_deck = true;
+        //if the user was making any edits, wipe all changes
+        if(self.vue.prev_deck_editing != null){
+            self.vue.curr_decks[self.vue.prev_deck_editing].editing_deck = false;
+            self.vue.prev_deck_editing = null;
+            self.get_cards();
+        }
     }
 
     //canceling creating new deck
@@ -174,15 +193,23 @@ var app = function() {
 
     /*Start editing a deck */
     self.edit_deck = function(idx){
+        //close add deck option if it is open
+        self.vue.adding_deck = false;
+
+        //if there was a previous deck being editted, close it and and remove edits
         if(self.vue.prev_deck_editing != null){
             self.vue.curr_decks[self.vue.prev_deck_editing].editing_deck = false;
+            self.vue.get_cards();
         }
+        //set the specified deck as being edited
         self.vue.curr_decks[idx].editing_deck = true;
         self.vue.prev_deck_editing = idx;
         self.vue.form_deck_name = self.vue.curr_decks[idx].deck_name;
 
+        //initialize all cards as neither being deleted nor their caption being edited
         for(var i=0; i<self.vue.curr_cards.length; i++){
             self.vue.curr_cards[i].is_deleting = false;
+            self.vue.curr_cards[i].editing_caption = false;
         }
 
     }
@@ -191,6 +218,7 @@ var app = function() {
     self.cancel_deck_edit = function(idx){
         self.vue.curr_decks[idx].editing_deck = false;
         self.vue.prev_deck_editing = null;
+        self.vue.get_cards();
     }
 
     /*Submit the edit, and change the deck name to what is specified */
@@ -206,13 +234,17 @@ var app = function() {
                     var card_id = self.vue.curr_cards[card_idx].card_id;
                     self.delete_card(card_id);
                 }
+                //clear the deletion cart
+                self.vue.delete_cart = [];
             }
         }
 
         var deckid = self.vue.curr_decks[idx].id;
         var new_deck_name = self.vue.form_deck_name;
 
+        //if user did not click cancel, continue
         if(continue_del){
+            //finish updating the deck name in the database
             $.post(edit_deck_url,
                 {
                     deck_id: deckid,
@@ -222,6 +254,7 @@ var app = function() {
                     self.vue.curr_decks[idx].deck_name = data;
                     self.vue.curr_decks[idx].editing_deck = false;
                     self.vue.prev_deck_editing = null;
+                    self.update_captions();
                 });
         }
     }
@@ -246,6 +279,12 @@ var app = function() {
         }
     }
 
+/*
+------------------------------------------------------------------------------------
+card functions
+------------------------------------------------------------------------------------
+*/
+
     /*delete the card with the following cardid */
     self.delete_card = function(cardid){
         $.post(del_card_url,
@@ -263,11 +302,15 @@ var app = function() {
             function (data) {
                 enumerate(data);
                 self.vue.curr_cards = data;
+                self.vue.delete_cart = [];
+                self.vue.caption_cart = [];
             })
     }
 
+    //toggle the deletion status of a card
     self.toggle_delete_card = function(idx){
         var del = self.vue.curr_cards[idx].is_deleting;
+        //if card was previously meant to be deleted, it should now not be
         if(del){
             for(var i=0; i<self.vue.delete_cart.length; i++ ){
                 if(self.vue.delete_cart[i] == idx){
@@ -276,10 +319,12 @@ var app = function() {
                 }
             }
         }
+        //otherwise it should now be deleted
         else self.vue.delete_cart.push(idx);
         self.vue.curr_cards[idx].is_deleting = !self.vue.curr_cards[idx].is_deleting;
     }
 
+    //check the deletion status of a card to determine what icon to show
     self.is_delete_card = function(idx){
         return self.vue.delete_cart.indexOf(idx) != -1;
     }
@@ -290,7 +335,37 @@ var app = function() {
         return true;
     }
 
-    //DEBUG FUNCTION
+    //add the card index of an edited caption to the caption cart
+    self.edit_caption = function(idx){
+        //only add to cart if caption has not previously been edited
+        if(self.vue.caption_cart.indexOf(idx) == -1){
+            self.vue.caption_cart.push(idx);
+        }
+    }
+
+    /*update captions in the database if the user made edits to any and confirmed them */
+    self.update_captions = function(){
+        for(var i=0; i<self.vue.caption_cart.length; i++){
+            var card_idx = self.vue.caption_cart[i];
+            var card_id = self.vue.curr_cards[card_idx].card_id;
+            $.post(update_caption_url,
+                {
+                    card_id: card_id,
+                    caption: self.vue.curr_cards[card_idx].caption
+                },
+                function(data){
+                    console.log("Caption updated!");
+                }
+            )
+        }
+        //clear caption cart after edits are submitted
+        self.vue.caption_cart = [];
+    }
+/*
+------------------------------------------------------------------------------------
+debug functions
+------------------------------------------------------------------------------------
+*/
     self.delete_my_decks = function(){
         $.get(delete_my_decks_url,
             function(){
@@ -299,7 +374,11 @@ var app = function() {
         )
     }
 
-    //our vue object
+/*
+------------------------------------------------------------------------------------
+Our Vue Object
+------------------------------------------------------------------------------------
+*/
     self.vue = new Vue({
         el: "#vue-div",
         delimiters: ['${', '}'],
@@ -311,6 +390,7 @@ var app = function() {
             curr_decks: [],         //storeall decks of signed in user
             curr_cards: [],          //store all cards of signed in user
             delete_cart: [],
+            caption_cart: [],
             prev_deck_uploading: null,
             prev_deck_editing: null
         },
@@ -337,6 +417,8 @@ var app = function() {
             toggle_delete_card: self.toggle_delete_card,
             is_delete_card: self.is_delete_card,
             is_caption: self.is_caption,
+            edit_caption: self.edit_caption,
+            update_captions: self.update_captions,
 
             //debug functions
             delete_my_decks: self.delete_my_decks
@@ -344,8 +426,12 @@ var app = function() {
 
     });
 
-    /*initialize values like login status, decks, and cards when user
-      first signs in*/
+/*
+------------------------------------------------------------------------------------
+initialize values like login status, decks, and cards when user
+first signs in
+------------------------------------------------------------------------------------
+*/
     var initialize = function(){
         $.get(login_status_url,
             function (user) {

@@ -102,6 +102,15 @@ def del_card():
     return "done"
 
 '''
+update the caption of the card with the given card_id
+'''
+def update_caption():
+    card_id = request.vars.card_id
+    newcaption = request.vars.caption
+    entry = db(db.cards.id == card_id).select().first()
+    entry.update_record(caption=newcaption)
+
+'''
 get login status. return user first name if they are signed in
 '''
 def login_status():
