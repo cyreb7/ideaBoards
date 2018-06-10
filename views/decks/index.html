@@ -154,3 +154,16 @@
 {{pass}}
 
 <script src="{{=URL('static', 'js/decks_index.js')}}"></script>
+<script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyBzWmOD4FCZYKV51zRBy5iiTLCzc8-qtJ0",
+    authDomain: "ideaboards-87017.firebaseapp.com",
+    databaseURL: "https://ideaboards-87017.firebaseio.com",
+    projectId: "ideaboards-87017",
+    storageBucket: "ideaboards-87017.appspot.com",
+    messagingSenderId: "387375900360"
+  };
+  firebase.initializeApp(config);
+</script>

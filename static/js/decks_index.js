@@ -74,6 +74,7 @@ handle card uploader
         if (file) {
             // First, gets an upload URL.
             console.log("Trying to get the upload url");
+            /*
             $.getJSON('https://upload-dot-luca-teaching.appspot.com/start/uploader/get_upload_url',
                 function (data) {
                     // We now have upload (and download) URLs.
@@ -87,7 +88,33 @@ handle card uploader
                     req.open("PUT", put_url, true);
                     req.send(file);
                 });
+            */
+            var storageRef = firebase.storage().ref();
+            var uploadTask = storageRef.child(file.name).put(file);
             
+            uploadTask.on('state_changed', function(snapshot){
+                // Observe state change events such as progress, pause, and resume
+                // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+                var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                console.log('Upload is ' + progress + '% done');
+                switch (snapshot.state) {
+                  case firebase.storage.TaskState.PAUSED: // or 'paused'
+                    console.log('Upload is paused');
+                    break;
+                  case firebase.storage.TaskState.RUNNING: // or 'running'
+                    console.log('Upload is running');
+                    break;
+                }
+              }, function(error) {
+                console.log('Upload failed:', error);
+              }, function() {
+                // Handle successful uploads on complete
+                // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+                uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+                    self.upload_complete(downloadURL, caption);
+                });
+              });
+
             // Start reading file into data-URL
             reader.readAsDataURL(file);
         }
@@ -234,8 +261,6 @@ deck function
                     var card_id = self.vue.curr_cards[card_idx].card_id;
                     self.delete_card(card_id);
                 }
-                //clear the deletion cart
-                self.vue.delete_cart = [];
             }
         }
 
@@ -251,9 +276,15 @@ deck function
                     deck_name: new_deck_name
                 },
                 function (data) {
+                    //update deck name
                     self.vue.curr_decks[idx].deck_name = data;
+                    //finish editing deck
                     self.vue.curr_decks[idx].editing_deck = false;
                     self.vue.prev_deck_editing = null;
+                    //clear the deletion cart and
+                    self.vue.delete_cart = [];
+                    self.vue.get_cards();
+                    //update the captions
                     self.update_captions();
                 });
         }
@@ -292,7 +323,7 @@ card functions
                 card_id: cardid
             },
             function (data) {
-                self.get_cards();
+                
             })
     }
 
