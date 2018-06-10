@@ -3,8 +3,7 @@
 <!-- Followed installation instructions and an example from here:
 http://learn.jquery.com/jquery-ui/getting-started/ -->
 {{block head}}
-<link rel="stylesheet" href="static/css/jquery-ui.css">
-<script src="static/js/jquery-ui.js"></script>
+<link rel="stylesheet" href="{{=URL('static', 'css/jquery-ui.css')}}">
 <script>
     var my_url = "{{=URL('api', 'my_method')}}";
 </script>
@@ -28,5 +27,5 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     </div>
 </div>
 
-
+<script src="{{=URL('static', 'js/jquery-ui.js')}}"></script>
 <script src="{{=URL('static', 'js/boards_index.js')}}"></script>
