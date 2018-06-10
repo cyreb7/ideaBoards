@@ -16,12 +16,13 @@ var app = function() {
 
 /*
 ------------------------------------------------------------------------------------
- 
+ Drag and drop functionality
 ------------------------------------------------------------------------------------
 */
-    self.calendar = function(){
+    self.initialize_draggable = function() {
         $( "#sampleCard" ).draggable();
     }
+
     
 // Copped from decks_index.js
 // Really should be modularized
@@ -84,6 +85,9 @@ Our Vue Object
 
             //card functions
             get_cards: self.get_cards,
+            
+            // Draggable functions
+            initialize_draggable: self.initialize_draggable,
         }
 
     });
@@ -105,7 +109,9 @@ first signs in
                     self.get_cards();
                 }
             });
-    }();        
+    }();
+    
+    self.initialize_draggable();
 
     $("#vue-div").show();
 
