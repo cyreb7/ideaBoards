@@ -106,8 +106,8 @@
               <ul class="container">
                 
                 <!--Iterate through our cards and only show cards that belong to the current deck-->
-                <li v-for="image in curr_cards">
-                  <div v-if="image.deck_id==d.id" class="quarter" style="float:left; margin-right:40px;">
+                <li v-for="image in curr_cards" v-if="image.deck_id==d.id" class="quarter">
+                  <div>
                     <div>
                       
                       <!--Each image is placed in a card-->
