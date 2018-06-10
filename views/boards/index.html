@@ -5,7 +5,12 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
 {{block head}}
 <link rel="stylesheet" href="{{=URL('static', 'css/jquery-ui.css')}}">
 <script>
-    var my_url = "{{=URL('api', 'my_method')}}";
+  //determine if user is signed in
+    var login_status_url = "{{=URL('api', 'login_status', user_signature=True)}}";
+  //urls for managing our decks
+    var get_decks_url = "{{=URL('api', 'get_decks', user_signature=True)}}";
+  //urls for managing our cards
+    var show_cards_url = "{{=URL('api', 'show_cards', user_signature=True)}}";
 </script>
 <!-- Found out how to do rounded corners from here: https://www.w3schools.com/css/css3_borders.asp -->
 <style>#sampleCard{
@@ -18,13 +23,58 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
 </style>
 {{end}}
 
-<div id="vue-div" class="display:none">
-    <h2>Boards</h2>
-    <!-- This is based on the "Default funtionality" code from this site:
-    https://jqueryui.com/draggable/ -->
-    <div id="sampleCard" class="ui-widget-content">
-      <p> Sample Card </p>
+<div id="vue-div" class="display:none container">
+    
+    <!-- Left sidebar -->
+    <div class="quarter black">
+      <h2>Boards</h2>
+      
+      <!--show a list of decks belonging to a user-->
+      <ul>
+        <li v-for="d in curr_decks">
+          <div class="accordion">
+            <!-- checkbox here is to keep the state of the accordion
+              its id must be unique and referened by the label -->
+            <input type="checkbox" v-bind:id="d.id">
+            <label v-bind:for="d.id"><a>${d.deck_name}</a></label>
+            <div>
+              <div class="padded container">
+                <!--Container to show our images-->
+                <div class="image_container" v-if="curr_cards.length>0">
+                  <ul class="container">
+                    
+                    <!--Iterate through our cards and only show cards that belong to the current deck-->
+                    <li v-for="image in curr_cards" v-if="image.deck_id==d.id">
+                      <div>
+                        <div>
+                          
+                          <!--Each image is placed in a card-->
+                          <p class="idea-card lifted">
+                            <img v-bind:src="image.card_image_url"/>
+                            <!--Display text within image-->
+                            <span class="padded">${image.caption}</span>
+                          </p>
+                        </div>
+                      </div>
+                    </li> 
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+      </ul>
     </div>
+    
+    <!-- Main -->
+    <div class="threequarters">
+      <!-- This is based on the "Default funtionality" code from this site:
+      https://jqueryui.com/draggable/ -->
+      <div id="sampleCard" class="ui-widget-content">
+        <p> Sample Card </p>
+      </div>
+    </div>
+    
 </div>
 
 <script src="{{=URL('static', 'js/jquery-ui.js')}}"></script>
