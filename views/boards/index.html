@@ -27,10 +27,10 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     
     <!-- Left sidebar -->
     <div class="quarter black">
-      <h2>Boards</h2>
+      <h2 class="padded">Boards</h2>
       
       <!--show a list of decks belonging to a user-->
-      <ul>
+      <ul class="padded">
         <li v-for="d in curr_decks">
           <div class="accordion">
             <!-- checkbox here is to keep the state of the accordion
@@ -38,10 +38,10 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
             <input type="checkbox" v-bind:id="d.id">
             <label v-bind:for="d.id"><a>${d.deck_name}</a></label>
             <div>
-              <div class="padded container">
+              <div class="container">
                 <!--Container to show our images-->
                 <div class="image_container" v-if="curr_cards.length>0">
-                  <ul class="container">
+                  <ul class="container no-spacing">
                     
                     <!--Iterate through our cards and only show cards that belong to the current deck-->
                     <li v-for="image in curr_cards" v-if="image.deck_id==d.id">

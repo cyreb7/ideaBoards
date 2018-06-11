@@ -25,6 +25,16 @@ h1 {
 	margin-bottom: 1em;
 }
 
+.no-spacing {
+	margin: 0;
+	padding: 0;
+}
+
+// Stupid CSS double pads containers
+.quarter > .padded {
+	padding-right: 0;
+}
+
 // Wrapper for cards
 .idea-card {
 	position: relative;
