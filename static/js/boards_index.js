@@ -61,7 +61,7 @@ card functions
 ------------------------------------------------------------------------------------
 */
     
-    // Using components to get JQuery working
+    // Using components to get JQuery binding properly
     // See https://vuejsdevelopers.com/2017/05/20/vue-js-safely-jquery-plugin/
     Vue.component('idea-card', {
         props: ['image_url', 'image_caption'],
@@ -71,7 +71,17 @@ card functions
                     <span class="padded">{{image_caption}}</span>\
                   </p>',
         mounted: function() {
-            $(this.$el).draggable();
+            // http://api.jqueryui.com/draggable/
+            $(this.$el).draggable({
+                stop: function(event, ui) {
+                    // Stop dragging
+                    // Need to force this because it gets confused by
+                    // the CSS switch to absolute positioning
+                    $(event.target).css('top', 0).css('left', 0);
+                },
+                revert: true,
+                revertDuration: false
+            });
         }
     });
 
