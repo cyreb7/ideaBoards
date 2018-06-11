@@ -28,7 +28,7 @@ db.define_table('boards',
                 Field('created_on', 'datetime', default=request.now),
                 Field('created_by', 'reference auth_user', default=auth.user_id),
                 Field('board_name'),
-                Field('board_content', default='')
+                Field('board_content', 'string', default='')
                 )
 # after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)

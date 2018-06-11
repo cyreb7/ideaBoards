@@ -15,6 +15,8 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     var get_boards_url = "{{=URL('boards', 'get_boards', user_signature=True)}}";
     var add_board_url = "{{=URL('boards', 'add_board', user_signature=True)}}";
     var delete_board_url = "{{=URL('boards', 'delete_board', user_signature=True)}}";
+    var save_board_url = "{{=URL('boards', 'save_board', user_signature=True)}}";
+    var get_board_content_url = "{{=URL('boards', 'get_board_content', user_signature=True)}}";
 </script>
 <!-- Found out how to do rounded corners from here: https://www.w3schools.com/css/css3_borders.asp -->
 <style>#sampleCard{
@@ -67,7 +69,7 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     
     <!-- Main middle content -->
     <div class="half">
-      <svg id="board" width="400" height="550" onload="makeDraggable(evt)"></svg>
+      <svg id="board" width="820" height="600" onload="makeDraggable(evt)"></svg>
     </div>
     
     <!-- Right sidebar -->

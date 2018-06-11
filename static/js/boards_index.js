@@ -68,6 +68,7 @@ card functions
                 //initialize all deck uploading status
                 enumerate(data);
                 self.vue.curr_boards = data;
+                self.board_open(0);
             }
         )
     }
@@ -105,6 +106,15 @@ card functions
         var board_name = self.vue.curr_boards[idx].board_name;
         self.vue.open_board_id = board_id;
         self.vue.open_board_name = board_name;
+        var svg = document.getElementById("board");
+        svg.innerHTML = "";
+        $.post(get_board_content_url,
+            {
+                board_id: board_id
+            },
+            function (data) {
+                svg.innerHTML = data; 
+            });
     }
 
     self.board_delete = function(idx){
@@ -120,6 +130,18 @@ card functions
                     self.vue.curr_boards.splice(idx, 1);
                 });
         }
+    }
+
+    self.save_board = function() {
+        var board_state = document.getElementById("board").innerHTML;
+        $.post(save_board_url,
+            {
+                board_state: board_state,
+                board_id: self.vue.open_board_id
+            },
+            function (data) {
+                console.log("Saved board");
+            });
     }
 /*
 ------------------------------------------------------------------------------------
@@ -151,12 +173,14 @@ card functions
         //uncommenting the below adds text without line breaks,
         //but it also does not follow the image when dragged...
         
-        var text = g.append("text")
-        .text(card.caption)
-        .attr("x", xOffset)
-        .attr("y", yOffset + 50);
+        // var text = g.append("text")
+        // .text(card.caption)
+        // .attr("x", xOffset)
+        // .attr("y", yOffset + 50);
         //.style("width", 90);
         
+        self.save_board();
+
         //bug text does not have line breaks..
     }
 
@@ -220,7 +244,8 @@ Our Vue Object
             board_create_cancel: self.board_create_cancel,
             board_create_confirm: self.board_create_confirm,
             board_open: self.board_open,
-            board_delete: self.board_delete
+            board_delete: self.board_delete,
+            save_board: self.save_board
         },
     });
 
@@ -265,7 +290,7 @@ function makeDraggable(evt) {
     svg.addEventListener('mousedown', startDrag);
     svg.addEventListener('mousemove', drag);
     svg.addEventListener('mouseup', endDrag);
-    svg.addEventListener('mouseleave', endDrag);
+    //svg.addEventListener('mouseleave', endDrag);
     function startDrag(evt) {
             selectedElement = evt.target;
             offset = getMousePosition(evt);
@@ -303,6 +328,7 @@ function makeDraggable(evt) {
           }
     }
     function endDrag(evt) {
+        APP.save_board();
         selectedElement = null;
     }
   }

@@ -48,3 +48,14 @@ remove the board with the given board_id from the db
 @auth.requires_signature()
 def delete_board():
     db(db.boards.id == request.vars.board_id).delete()
+
+@auth.requires_signature()
+def save_board():
+    board_id = int(request.vars.board_id)
+    entry = db(db.boards.id == board_id and auth.user.id == db.boards.created_by).select().first()
+    entry.update_record(board_content=request.vars.board_state)
+
+@auth.requires_signature()
+def get_board_content():
+    row = db(db.boards.created_by == auth.user_id and request.vars.board_id == db.boards.id).select().first()
+    return response.json(row.board_content)
