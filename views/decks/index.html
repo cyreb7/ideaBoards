@@ -60,20 +60,20 @@
           <div class="padded container">
             
             <!-- Uploading buttons and stuff -->
-            <div class="padded">
+            <div class="padded bottom-border">
               <!-- Edit buttons -->
-              <div class="bottom-border">
+              <div>
                 <!-- Adding card -->
                 <button v-if="!d.is_uploading && !(d.editing_deck && !adding_deck)" v-on:click="open_uploader(d._idx)">Add Card</button>
-                <button v-if="d.is_uploading" v-on:click="close_uploader(d._idx)">Cancel</button>
                 
                 <!-- Editing deck -->
                 <button v-if="!d.is_uploading && !(d.editing_deck && !adding_deck)" v-on:click="edit_deck(d._idx)">Edit Deck</button>
-                <button v-if="d.editing_deck && !adding_deck" v-on:click="cancel_deck_edit(d._idx)">Cancel</button>
-              </div>
+                </div>
               
               <!--Show the uploader if user is currently uploading card to this deck-->
               <div id="uploader_div" v-if="d.is_uploading">
+                <h3 class="form-title bottom-border">New Card</h3>
+
                 <label>
                   Upload an image file: 
                   <input id="file_input" type="file" accept="image/jpeg">
@@ -86,13 +86,17 @@
                 
                 <!--Submit button will confirm upload, Cancel will go back-->
                 <button v-on:click="upload_file">Submit</button>
+                <button v-on:click="close_uploader(d._idx)">Cancel</button>
               </div>
               
               <!--if user is editing a deck show the below-->
               <div v-if="d.editing_deck && !adding_deck">
-                <input id="deck_name"
+                <label><h3 class="form-title bottom-border">Deck Name</h3>
+                  <input id="deck_name"
                     v-model="form_deck_name" placeholder="New Deck Name" type="text" />
+                </label>
                 <button v-on:click="submit_deck_edit(d._idx)">submit</button>
+                <button v-on:click="cancel_deck_edit(d._idx)">Cancel</button>
                 <button v-on:click="delete_deck(d._idx)" 
                         style="float:right; background-color: crimson">
                   delete deck

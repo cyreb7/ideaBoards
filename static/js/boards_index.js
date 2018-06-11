@@ -126,11 +126,11 @@ card functions
     Vue components
 ------------------------------------------------------------------------------------
 */
-
+  
 
     //redraw the card onto the svg canvas
     svg_draw = function(card, xPos, yPos){
-        var WIDTH = 100;
+        var WIDTH = 150;
         var HEIGHT = 140;
         
         //svg uses its local position. Note that svg builds from topleft, so higher y goes downward
@@ -138,25 +138,27 @@ card functions
         var xOffset = xPos - offset.left - (WIDTH / 2);
         var yOffset = yPos - offset.top - (HEIGHT / 2);
         
-        var g = d3.select("svg").append("g");
+        var g = d3.select("svg").append("g").attr("width", WIDTH);
 
         //draw the card image near site of drop
         g.append("svg:image")
         .attr("x", xOffset)
         .attr("y", yOffset)
         .attr("width", WIDTH)
-        .attr("height", HEIGHT)
+        //.attr("height", HEIGHT)
         .attr("xlink:href", card.card_image_url);
 
         //uncommenting the below adds text without line breaks,
         //but it also does not follow the image when dragged...
-        /*
-        g.append("text")
+        
+        var text = g.append("text")
         .text(card.caption)
         .attr("x", xOffset)
-        .attr("y", yOffset + 50)
-        .style("width", 90);
-        */
+        .attr("y", yOffset + 50);
+
+        new d3plus.textBox().select(text).data(card.caption).width(WIDTH-10).render();
+        //.style("width", 90);
+        
         //bug text does not have line breaks..
     }
 

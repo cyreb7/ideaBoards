@@ -45,8 +45,14 @@ h1 {
 /* line 45, ../sass/_main.scss */
 .idea-card {
   position: relative;
+  width: 150px;
+  height: auto;
 }
-/* line 55, ../sass/_main.scss */
+/* line 51, ../sass/_main.scss */
+.idea-card img {
+  display: block;
+}
+/* line 57, ../sass/_main.scss */
 .idea-card span {
   display: block;
   height: 100%;
@@ -59,7 +65,13 @@ h1 {
   word-break: break-word;
 }
 
-/* line 70, ../sass/_main.scss */
+/* line 73, ../sass/_main.scss */
+.form-title {
+  font-size: 2em;
+  margin-bottom: .5em;
+}
+
+/* line 78, ../sass/_main.scss */
 #board {
   box-sizing: content-box;
   border: 3px solid black;
@@ -67,7 +79,7 @@ h1 {
   margin: auto;
 }
 
-/* line 78, ../sass/_main.scss */
+/* line 86, ../sass/_main.scss */
 .ui-draggable-dragging {
   position: absolute;
 }
