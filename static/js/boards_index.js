@@ -134,20 +134,26 @@ card functions
         var xOffset = xPos-560;
         var yOffset = yPos - 100;
 
+        var g = d3.select("svg").append("g");
+
         //draw the card image near site of drop
-        d3.select("svg").append("svg:image")
+        g.append("svg:image")
         .attr("x", xOffset)
         .attr("y", yOffset)
         .attr("width", 100)
         .attr("height", 140)
         .attr("xlink:href", card.card_image_url);
-        
-        //bug text does not have line breaks...
-        d3.select("svg").append("text")
+
+        //uncommenting the below adds text without line breaks,
+        //but it also does not follow the image when dragged...
+        /*
+        g.append("text")
         .text(card.caption)
         .attr("x", xOffset)
         .attr("y", yOffset + 50)
         .style("width", 90);
+        */
+        //bug text does not have line breaks..
     }
 
     // Using components to get JQuery binding properly
@@ -240,6 +246,57 @@ first signs in
 };
 
 var APP = null;
+
+var selectedElement, offset, transform;
+var selectedElement = false;
+
+function makeDraggable(evt) {
+    var svg = evt.target;
+    svg.addEventListener('mousedown', startDrag);
+    svg.addEventListener('mousemove', drag);
+    svg.addEventListener('mouseup', endDrag);
+    svg.addEventListener('mouseleave', endDrag);
+    function startDrag(evt) {
+            selectedElement = evt.target;
+            offset = getMousePosition(evt);
+            // Get all the transforms currently on this element
+            var transforms = selectedElement.transform.baseVal;
+            // Ensure the first transform is a translate transform
+            if (transforms.length === 0 || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
+              // Create an transform that translates by (0, 0)
+              var translate = svg.createSVGTransform();
+              translate.setTranslate(0, 0);
+              // Add the translation to the front of the transforms list
+              selectedElement.transform.baseVal.insertItemBefore(translate, 0);
+            }
+            // Get initial translation amount
+            transform = transforms.getItem(0);
+            offset.x -= transform.matrix.e;
+            offset.y -= transform.matrix.f;
+          
+    }
+
+    function getMousePosition(evt) {
+        var CTM = svg.getScreenCTM();
+        return {
+          x: (evt.clientX - CTM.e) / CTM.a,
+          y: (evt.clientY - CTM.f) / CTM.d
+        };
+      }
+
+    function drag(evt) {
+        if (selectedElement) {
+            evt.preventDefault();
+            var coord = getMousePosition(evt);
+            selectedElement.setAttributeNS(null, "x", coord.x);
+            selectedElement.setAttributeNS(null, "y", coord.y);
+          }
+    }
+    function endDrag(evt) {
+        selectedElement = null;
+    }
+  }
+
 
 // This will make everything accessible from the js console;
 // for instance, self.x above would be accessible as APP.x
