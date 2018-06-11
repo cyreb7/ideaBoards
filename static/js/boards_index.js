@@ -113,6 +113,7 @@ card functions
                 board_id: board_id
             },
             function (data) {
+                console.log(data);
                 svg.innerHTML = data; 
             });
     }
@@ -140,7 +141,7 @@ card functions
                 board_id: self.vue.open_board_id
             },
             function (data) {
-                console.log("Saved board");
+                console.log("Saved board: ", data);
             });
     }
 /*

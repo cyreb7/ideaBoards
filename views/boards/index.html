@@ -69,7 +69,7 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     
     <!-- Main middle content -->
     <div class="half">
-      <svg id="board" width="820" height="600" onload="makeDraggable(evt)"></svg>
+      <svg id="board" width="720" height="600" onload="makeDraggable(evt)"></svg>
     </div>
     
     <!-- Right sidebar -->
@@ -104,7 +104,7 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
         <tbody v-for="b in curr_boards">
           <!--on click, show images of that user-->
           <td v-on:click="board_open(b._idx)">
-            ${b.board_name}
+            ${b.board_name}, ${open_board_name}, ${b.id}, ${open_board_id}
             <button style="float:right;" v-on:click="board_delete(b._idx)">
                 <i class="fa fa-trash fa-lg"></i>
               </button>
