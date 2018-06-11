@@ -126,7 +126,30 @@ card functions
     Vue components
 ------------------------------------------------------------------------------------
 */
-    
+
+
+    //redraw the card onto the svg canvas
+    svg_draw = function(card, xPos, yPos){
+        //svg uses its local position. Note that svg builds from topleft, so higher y goes downward
+        var xOffset = xPos-560;
+        var yOffset = yPos - 100;
+
+        //draw the card image near site of drop
+        d3.select("svg").append("svg:image")
+        .attr("x", xOffset)
+        .attr("y", yOffset)
+        .attr("width", 100)
+        .attr("height", 140)
+        .attr("xlink:href", card.card_image_url);
+        
+        //bug text does not have line breaks...
+        d3.select("svg").append("text")
+        .text(card.caption)
+        .attr("x", xOffset)
+        .attr("y", yOffset + 50)
+        .style("width", 90);
+    }
+
     // Using components to get JQuery binding properly
     // See https://vuejsdevelopers.com/2017/05/20/vue-js-safely-jquery-plugin/
     Vue.component('idea-card', {
@@ -143,10 +166,9 @@ card functions
             
             $(this.$el).draggable({
                 stop: function(event, ui) {
-                    // Stop dragging
-                    
+                    //Draw the image onto the svg canvas
+                    svg_draw(self.image, event.clientX, event.offsetY);
                     console.log(self.image, "dropped at", event.clientX, event.offsetY);
-                    
                     // Need to force this because it gets confused by
                     // the CSS switch to absolute positioning
                     $(event.target).css('top', 0).css('left', 0);

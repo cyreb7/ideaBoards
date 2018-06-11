@@ -4,6 +4,7 @@
 http://learn.jquery.com/jquery-ui/getting-started/ -->
 {{block head}}
 <link rel="stylesheet" href="{{=URL('static', 'css/jquery-ui.css')}}">
+<script src="http://d3js.org/d3.v4.min.js"></script>
 <script>
   //determine if user is signed in
     var login_status_url = "{{=URL('api', 'login_status', user_signature=True)}}";
@@ -30,7 +31,7 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
 <div id="vue-div" class="display:none container">
     
     <!-- Left sidebar -->
-    <div class="quarter black max-height">
+    <div class="quarter black max-height" style="float:left;">
       <h2 class="padded">Boards</h2>
       
       <!--show a list of decks belonging to a user-->
@@ -52,7 +53,7 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
                       <div>
                         <div>
                           <!--Each image is placed in a card-->
-                          <idea-card v-bind:image="image"></idea-card>
+                          <idea-card class="idea" v-bind:image="image"></idea-card>
                         </div>
                       </div>
                     </li> 
@@ -65,13 +66,9 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
       </ul>
     </div>
     
-    <!-- Main -->
-    <div class="threequarters">
-      <!-- This is based on the "Default funtionality" code from this site:
-      https://jqueryui.com/draggable/ -->
-    </div>
+    <svg width="560" height="600" style="float:left;"></svg>
     
-    <div class="user_space quarter right">
+    <div class="user_space right" style="float:left;">
         <h5>Your Boards</h5>
         <p v-if="open_board_name != null">Open Board: ${open_board_name}</p>
         <button v-if="!adding_board" class="btn red" v-on:click="board_create">
