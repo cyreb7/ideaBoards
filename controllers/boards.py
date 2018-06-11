@@ -20,40 +20,31 @@ def index():
     # response.flash = T("Hello World")
     return dict(message=T('Welcome to web2py!'))
 
+'''
+get all boards that belong to the signed in user
+'''
+@auth.requires_signature()
+def get_boards():
+    curr_boards = []
+    rows = db(db.boards.created_by == auth.user_id).select()
+    for r in rows:
+        curr_boards.append(r)
+    return response.json(curr_boards)
 
-# def user():
-#     """
-#     exposes:
-#     http://..../[app]/default/user/login
-#     http://..../[app]/default/user/logout
-#     http://..../[app]/default/user/register
-#     http://..../[app]/default/user/profile
-#     http://..../[app]/default/user/retrieve_password
-#     http://..../[app]/default/user/change_password
-#     http://..../[app]/default/user/bulk_register
-#     use @auth.requires_login()
-#         @auth.requires_membership('group name')
-#         @auth.requires_permission('read','table name',record_id)
-#     to decorate functions that need access control
-#     also notice there is http://..../[app]/appadmin/manage/auth to allow administrator to manage users
-#     """
-#     return dict(form=auth())
+'''
+insert a new board into the database.
+'''
+@auth.requires_signature()
+def add_board():
+    t_id = db.boards.insert(
+        board_name = request.vars.board_name
+    )
+    entry = db(db.boards.id == t_id).select().first()
+    return response.json(entry)
 
-
-# @cache.action()
-# def download():
-#     """
-#     allows downloading of uploaded files
-#     http://..../[app]/default/download/[filename]
-#     """
-#     return response.download(request, db)
-
-
-# def call():
-#     """
-#     exposes services. for example:
-#     http://..../[app]/default/call/jsonrpc
-#     decorate with @services.jsonrpc the functions to expose
-#     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
-#     """
-#     return service()
+'''
+remove the board with the given board_id from the db
+'''
+@auth.requires_signature()
+def delete_board():
+    db(db.boards.id == request.vars.board_id).delete()

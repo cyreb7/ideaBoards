@@ -11,6 +11,10 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     var get_decks_url = "{{=URL('api', 'get_decks', user_signature=True)}}";
   //urls for managing our cards
     var show_cards_url = "{{=URL('api', 'show_cards', user_signature=True)}}";
+  //urls for managing our cards
+    var get_boards_url = "{{=URL('boards', 'get_boards', user_signature=True)}}";
+    var add_board_url = "{{=URL('boards', 'add_board', user_signature=True)}}";
+    var delete_board_url = "{{=URL('boards', 'delete_board', user_signature=True)}}";
 </script>
 <!-- Found out how to do rounded corners from here: https://www.w3schools.com/css/css3_borders.asp -->
 <style>#sampleCard{
@@ -67,6 +71,47 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
       https://jqueryui.com/draggable/ -->
     </div>
     
+    <div class="user_space quarter right">
+        <h5>Your Boards</h5>
+        <p v-if="open_board_name != null">Open Board: ${open_board_name}</p>
+        <button v-if="!adding_board" class="btn red" v-on:click="board_create">
+            <i class="fa fa-plus"></i> New Board
+          </button>
+            <!--Allow user to create new decks-->
+          <div v-else>
+            <form action="#" v-on:submit.prevent enctype="multipart/form-data" method="post">
+              <div class="form-group">
+                <div>
+                  <input class="form-control string"
+                          v-model="form_board_name" placeholder="Board Name" type="text" />
+                  <span class="help-block"></span>
+                </div>
+              </div>
+            </form>
+            <!--button to add the memo with the above title and description -->
+            <button class="btn red" v-on:click="board_create_confirm">
+              create
+            </button>
+            <button class="btn red" v-on:click="board_create_cancel">
+              cancel
+            </button>
+          </div>
+      <!-- Right part of the page -->
+      <table class="fill" id="user_selector">
+        <!--show all user boards in a list-->
+        <tbody v-for="b in curr_boards">
+          <!--on click, show images of that user-->
+          <td v-on:click="board_open(b._idx)">
+            ${b.board_name}
+            <button style="float:right;" v-on:click="board_delete(b._idx)">
+                <i class="fa fa-trash fa-lg"></i>
+              </button>
+          </td>
+        </tbody>
+      </table>
+
+    </div>
+
 </div>
 
 <script src="{{=URL('static', 'js/jquery-ui.js')}}"></script>
