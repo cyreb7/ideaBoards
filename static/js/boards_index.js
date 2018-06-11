@@ -138,8 +138,6 @@ card functions
         var xOffset = xPos - offset.left - (WIDTH / 2);
         var yOffset = yPos - offset.top - (HEIGHT / 2);
         
-        console.log(offset.left, offset.top, xOffset, yOffset)
-
         var g = d3.select("svg").append("g");
 
         //draw the card image near site of drop
@@ -179,7 +177,8 @@ card functions
             $(this.$el).draggable({
                 stop: function(event, ui) {
                     //Draw the image onto the svg canvas
-                    svg_draw(self.image, event.clientX, event.clientY);
+                    console.log(event);
+                    svg_draw(self.image, event.pageX, event.pageY);
                     // Need to force this because it gets confused by
                     // the CSS switch to absolute positioning
                     $(event.target).css('top', 0).css('left', 0);
