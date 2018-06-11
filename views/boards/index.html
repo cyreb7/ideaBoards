@@ -47,13 +47,8 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
                     <li v-for="image in curr_cards" v-if="image.deck_id==d.id">
                       <div>
                         <div>
-                          
                           <!--Each image is placed in a card-->
-                          <p class="idea-card lifted">
-                            <img v-bind:src="image.card_image_url"/>
-                            <!--Display text within image-->
-                            <span class="padded">${image.caption}</span>
-                          </p>
+                          <idea-card v-bind:image_url="image.card_image_url" v-bind:image_caption="image.caption"></idea-card>
                         </div>
                       </div>
                     </li> 
@@ -70,9 +65,6 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     <div class="threequarters">
       <!-- This is based on the "Default funtionality" code from this site:
       https://jqueryui.com/draggable/ -->
-      <div id="sampleCard" class="ui-widget-content">
-        <p> Sample Card </p>
-      </div>
     </div>
     
 </div>

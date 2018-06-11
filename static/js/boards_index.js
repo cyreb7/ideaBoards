@@ -13,16 +13,6 @@ var app = function() {
     
     // Enumerates an array.
     var enumerate = function(v) { var k=0; return v.map(function(e) {e._idx = k++;});};
-
-/*
-------------------------------------------------------------------------------------
- Drag and drop functionality
-------------------------------------------------------------------------------------
-*/
-    self.initialize_draggable = function() {
-        $( "#sampleCard" ).draggable();
-    }
-
     
 // Copped from decks_index.js
 // Really should be modularized
@@ -65,6 +55,25 @@ card functions
             })
     }
 
+/*
+------------------------------------------------------------------------------------
+    Vue components
+------------------------------------------------------------------------------------
+*/
+    
+    // Using components to get JQuery working
+    // See https://vuejsdevelopers.com/2017/05/20/vue-js-safely-jquery-plugin/
+    Vue.component('idea-card', {
+        props: ['image_url', 'image_caption'],
+        template: '<p class="idea-card lifted">\
+                    <img v-bind:src="image_url"/>\
+                    <!--Display text within image-->\
+                    <span class="padded">{{image_caption}}</span>\
+                  </p>',
+        mounted: function() {
+            $(this.$el).draggable();
+        }
+    });
 
 /*
 ------------------------------------------------------------------------------------
@@ -85,11 +94,7 @@ Our Vue Object
 
             //card functions
             get_cards: self.get_cards,
-            
-            // Draggable functions
-            initialize_draggable: self.initialize_draggable,
-        }
-
+        },
     });
 
 /*
@@ -111,8 +116,6 @@ first signs in
             });
     }();
     
-    self.initialize_draggable();
-
     $("#vue-div").show();
 
     return self;
