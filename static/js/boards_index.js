@@ -155,8 +155,6 @@ card functions
         .text(card.caption)
         .attr("x", xOffset)
         .attr("y", yOffset + 50);
-
-        new d3plus.textBox().select(text).data(card.caption).width(WIDTH-10).render();
         //.style("width", 90);
         
         //bug text does not have line breaks..
