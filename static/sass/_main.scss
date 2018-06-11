@@ -30,6 +30,12 @@ h1 {
 	padding: 0;
 }
 
+// Limits the height of the element to a percentage of the viewport
+.max-height {
+	max-height: 80vh;
+	overflow-y: scroll;
+}
+
 // Stupid CSS double pads containers
 .quarter > .padded {
 	padding-right: 0;

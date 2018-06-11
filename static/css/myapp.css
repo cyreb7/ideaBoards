@@ -32,15 +32,21 @@ h1 {
 }
 
 /* line 34, ../sass/_main.scss */
+.max-height {
+  max-height: 80vh;
+  overflow-y: scroll;
+}
+
+/* line 40, ../sass/_main.scss */
 .quarter > .padded {
   padding-right: 0;
 }
 
-/* line 39, ../sass/_main.scss */
+/* line 45, ../sass/_main.scss */
 .idea-card {
   position: relative;
 }
-/* line 49, ../sass/_main.scss */
+/* line 55, ../sass/_main.scss */
 .idea-card span {
   display: block;
   height: 100%;
@@ -53,7 +59,7 @@ h1 {
   word-break: break-word;
 }
 
-/* line 66, ../sass/_main.scss */
+/* line 72, ../sass/_main.scss */
 .ui-draggable-dragging {
   position: absolute;
 }
