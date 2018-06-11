@@ -247,6 +247,12 @@ first signs in
 
 var APP = null;
 
+
+/*
+Implement dragging within the svg canvas using the example code at
+http://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/
+*/
+
 var selectedElement, offset, transform;
 var selectedElement = false;
 
