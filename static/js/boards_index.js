@@ -130,9 +130,15 @@ card functions
 
     //redraw the card onto the svg canvas
     svg_draw = function(card, xPos, yPos){
+        var WIDTH = 100;
+        var HEIGHT = 140;
+        
         //svg uses its local position. Note that svg builds from topleft, so higher y goes downward
-        var xOffset = xPos-560;
-        var yOffset = yPos - 100;
+        var offset = $("#board").offset();
+        var xOffset = xPos - offset.left - (WIDTH / 2);
+        var yOffset = yPos - offset.top - (HEIGHT / 2);
+        
+        console.log(offset.left, offset.top, xOffset, yOffset)
 
         var g = d3.select("svg").append("g");
 
@@ -140,8 +146,8 @@ card functions
         g.append("svg:image")
         .attr("x", xOffset)
         .attr("y", yOffset)
-        .attr("width", 100)
-        .attr("height", 140)
+        .attr("width", WIDTH)
+        .attr("height", HEIGHT)
         .attr("xlink:href", card.card_image_url);
 
         //uncommenting the below adds text without line breaks,
@@ -173,8 +179,7 @@ card functions
             $(this.$el).draggable({
                 stop: function(event, ui) {
                     //Draw the image onto the svg canvas
-                    svg_draw(self.image, event.clientX, event.offsetY);
-                    console.log(self.image, "dropped at", event.clientX, event.offsetY);
+                    svg_draw(self.image, event.clientX, event.clientY);
                     // Need to force this because it gets confused by
                     // the CSS switch to absolute positioning
                     $(event.target).css('top', 0).css('left', 0);
