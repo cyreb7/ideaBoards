@@ -64,17 +64,23 @@ card functions
     // Using components to get JQuery binding properly
     // See https://vuejsdevelopers.com/2017/05/20/vue-js-safely-jquery-plugin/
     Vue.component('idea-card', {
-        props: ['image_url', 'image_caption'],
-        template: '<p class="idea-card lifted">\
-                    <img v-bind:src="image_url"/>\
+        props: ['image'],
+        template: '<p class="idea-card">\
+                    <img v-bind:src="image.card_image_url"/>\
                     <!--Display text within image-->\
-                    <span class="padded">{{image_caption}}</span>\
+                    <span class="padded">{{image.caption}}</span>\
                   </p>',
         mounted: function() {
             // http://api.jqueryui.com/draggable/
+            // Keep a copy of scope so we can access it within the JQuery functions
+            let self = this;
+            
             $(this.$el).draggable({
                 stop: function(event, ui) {
                     // Stop dragging
+                    
+                    console.log(self.image, "dropped at", event.clientX, event.offsetY);
+                    
                     // Need to force this because it gets confused by
                     // the CSS switch to absolute positioning
                     $(event.target).css('top', 0).css('left', 0);
