@@ -67,6 +67,12 @@ h1 {
 	}
 }
 
+#board {
+	box-sizing: content-box;
+	border: $border;
+	display: block;
+	margin: auto;
+}
 
 // Draggable classes
 .ui-draggable-dragging {

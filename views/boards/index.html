@@ -65,9 +65,13 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
       </ul>
     </div>
     
-    <svg width="560" height="600" onload="makeDraggable(evt)" style="float:left;"></svg>
+    <!-- Main middle content -->
+    <div class="half">
+      <svg id="board" width="400" height="550" onload="makeDraggable(evt)"></svg>
+    </div>
     
-    <div class="user_space right" style="float:left;">
+    <!-- Right sidebar -->
+    <div class="user_space quarter">
         <h5>Your Boards</h5>
         <p v-if="open_board_name != null">Open Board: ${open_board_name}</p>
         <button v-if="!adding_board" class="btn red" v-on:click="board_create">

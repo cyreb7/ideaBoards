@@ -59,7 +59,15 @@ h1 {
   word-break: break-word;
 }
 
-/* line 72, ../sass/_main.scss */
+/* line 70, ../sass/_main.scss */
+#board {
+  box-sizing: content-box;
+  border: 3px solid black;
+  display: block;
+  margin: auto;
+}
+
+/* line 78, ../sass/_main.scss */
 .ui-draggable-dragging {
   position: absolute;
 }
