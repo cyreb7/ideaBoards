@@ -4,7 +4,6 @@
 http://learn.jquery.com/jquery-ui/getting-started/ -->
 {{block head}}
 <link rel="stylesheet" href="{{=URL('static', 'css/jquery-ui.css')}}">
-<script src="http://d3js.org/d3.v4.min.js"></script>
 <script>
   //determine if user is signed in
     var login_status_url = "{{=URL('api', 'login_status', user_signature=True)}}";
@@ -110,6 +109,6 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     </div>
 
 </div>
-
+<script src="{{=URL('static', 'js/d3.v4.min.js')}}"></script>
 <script src="{{=URL('static', 'js/jquery-ui.js')}}"></script>
 <script src="{{=URL('static', 'js/boards_index.js')}}"></script>
