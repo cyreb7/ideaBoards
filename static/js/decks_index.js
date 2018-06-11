@@ -385,6 +385,7 @@ card functions
                     caption: self.vue.curr_cards[card_idx].caption
                 },
                 function(data){
+                    self.get_cards();
                     console.log("Caption updated!");
                 }
             )
