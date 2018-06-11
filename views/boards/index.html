@@ -104,7 +104,7 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
         <tbody v-for="b in curr_boards">
           <!--on click, show images of that user-->
           <td v-on:click="board_open(b._idx)">
-            ${b.board_name}, ${open_board_name}, ${b.id}, ${open_board_id}
+            ${b.board_name}
             <button style="float:right;" v-on:click="board_delete(b._idx)">
                 <i class="fa fa-trash fa-lg"></i>
               </button>
