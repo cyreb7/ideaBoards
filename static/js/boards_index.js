@@ -121,7 +121,7 @@ card functions
                 board_id: board_id
             },
             function (data) {
-                //console.log(board_id, " open and uploaded ", data);
+                console.log(board_id, " open and uploaded ", data);
                 svg.innerHTML = data; 
             });
     }
