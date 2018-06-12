@@ -20,6 +20,7 @@ h1 {
 	font-size: 1.8em;
 }
 
+// Adds a border under the element
 .bottom-border {
 	border-bottom: $border;
 	margin-bottom: 1em;
@@ -69,12 +70,18 @@ h1 {
 	}
 }
 
-// Titlefor forums
+// Title for forums
 .form-title {
 	font-size: 2em;
 	margin-bottom: .5em;
 }
 
+// The div that contains the board SVG
+#board-container {
+	min-width: 630px;
+}
+
+// The SVG board element
 #board {
 	box-sizing: content-box;
 	border: $border;

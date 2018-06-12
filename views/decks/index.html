@@ -40,10 +40,10 @@
     </form>
     <!--button to add the memo with the above title and description -->
     <button class="btn red" v-on:click="submit_new_deck()">
-      create
+      Create
     </button>
     <button class="btn red" v-on:click="cancel_new_deck()">
-      cancel
+      Cancel
     </button>
   </div>
   <br>
@@ -95,7 +95,7 @@
                   <input id="deck_name"
                     v-model="form_deck_name" placeholder="New Deck Name" type="text" />
                 </label>
-                <button v-on:click="submit_deck_edit(d._idx)">submit</button>
+                <button v-on:click="submit_deck_edit(d._idx)">Save changes</button>
                 <button v-on:click="cancel_deck_edit(d._idx)">Cancel</button>
                 <button v-on:click="delete_deck(d._idx)" 
                         style="float:right; background-color: crimson">
@@ -128,19 +128,12 @@
                           v-on:blur="edit_caption(image._idx)" type="text">
                         <!--if we are not deleting this card yet, show a trash can-->
                         <button v-if="!is_delete_card(image._idx)" v-on:click="toggle_delete_card(image._idx)">
-                          <i class="fa fa-trash fa-lg"></i>
+                          <i class="fa fa-check-square fa-lg"></i> Select to delete
                         </button>
                         <!--If this card is to be deleted, show a red deleting button-->
                         <button v-else v-on:click="toggle_delete_card(image._idx)" 
                                 style="background-color: crimson;">
-                                <i class="fa">deleting</i>
-                        </button>
-                      </div>
-                      
-                      <!--positioning if we are not editing-->
-                      <div v-if="!d.editing_deck">
-                        <button style="pointer-events: none; background-color: gray">
-                          <i class="fa fa-trash fa-lg"></i>
+                                <i class="fa fa-check-square-o fa-lg"></i> To be deleted
                         </button>
                       </div>
                     </div>
