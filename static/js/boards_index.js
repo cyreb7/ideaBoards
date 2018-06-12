@@ -173,11 +173,9 @@ card functions
         var offset = $("#board").offset();
         var xOffset = xPos - offset.left - (WIDTH / 2);
         var yOffset = yPos - offset.top - (HEIGHT / 2);
-        
-        var g = d3.select("svg").append("g").attr("width", WIDTH);
 
         //draw the card image near site of drop
-        g.append("svg:image")
+        d3.select("svg").append("svg:image")
         .attr("x", xOffset)
         .attr("y", yOffset)
         .attr("width", WIDTH)
