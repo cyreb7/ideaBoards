@@ -88,3 +88,8 @@ h1 {
 .ui-draggable-dragging {
   position: absolute;
 }
+
+.active {
+  stroke: #000;
+  stroke-width: 2px;
+}

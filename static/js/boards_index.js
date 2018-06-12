@@ -163,6 +163,12 @@ card functions
 ------------------------------------------------------------------------------------
 */
   
+function dragged(d) {
+    d3.select(this)
+      .attr("x", d3.event.x)
+      .attr("y", d3.event.y);
+  }
+
 
     //redraw the card onto the svg canvas
     svg_draw = function(card, xPos, yPos){
@@ -175,24 +181,18 @@ card functions
         var yOffset = yPos - offset.top - (HEIGHT / 2);
         
         var g = d3.select("svg").append("g").attr("width", WIDTH);
-
-        //draw the card image near site of drop
-        g.append("svg:image")
+        
+        g.append("foreignObject")
         .attr("x", xOffset)
         .attr("y", yOffset)
-        .attr("width", WIDTH)
-        //.attr("height", HEIGHT)
-        .attr("xlink:href", card.card_image_url);
+         .attr("width", 200)
+         .attr("height", 140)
+         .append("xhtml:div")
+         .html('<p class=\"idea-card lifted\"><img src=' + card.card_image_url +
+              '/><span class=\"padded\">'+ card.caption + '</span></p>');
+              
+         d3.selectAll("foreignObject").call(d3.drag().on("drag", dragged));
 
-        //uncommenting the below adds text without line breaks,
-        //but it also does not follow the image when dragged...
-        
-        // var text = g.append("text")
-        // .text(card.caption)
-        // .attr("x", xOffset)
-        // .attr("y", yOffset + 50);
-        //.style("width", 90);
-        
         //save the board after the user makes a change
         self.save_board();
 
@@ -216,7 +216,6 @@ card functions
             $(this.$el).draggable({
                 stop: function(event, ui) {
                     //Draw the image onto the svg canvas
-                    console.log(event);
                     svg_draw(self.image, event.pageX, event.pageY);
                     // Need to force this because it gets confused by
                     // the CSS switch to absolute positioning
@@ -299,63 +298,6 @@ Code taken from
 http://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/
 -------------------------------------------------------------------------------
 */
-
-var selectedElement, offset, transform;
-selectedElement = false;
-
-//handle dragging within the svg canvas
-function makeDraggable(evt) {
-    var svg = evt.target;
-    svg.addEventListener('mousedown', startDrag);
-    svg.addEventListener('mousemove', drag);
-    svg.addEventListener('mouseup', endDrag);
-    
-    //when the drag starts
-    function startDrag(evt) {
-            selectedElement = evt.target;
-            offset = getMousePosition(evt);
-            // Get all the transforms currently on this element
-            var transforms = selectedElement.transform.baseVal;
-            // Ensure the first transform is a translate transform
-            if (transforms.length === 0 || transforms.getItem(0).type !== SVGTransform.SVG_TRANSFORM_TRANSLATE) {
-              // Create an transform that translates by (0, 0)
-              var translate = svg.createSVGTransform();
-              translate.setTranslate(0, 0);
-              // Add the translation to the front of the transforms list
-              selectedElement.transform.baseVal.insertItemBefore(translate, 0);
-            }
-            // Get initial translation amount
-            transform = transforms.getItem(0);
-            offset.x -= transform.matrix.e;
-            offset.y -= transform.matrix.f;
-          
-    }
-
-    //get position of the mouse in the browser
-    function getMousePosition(evt) {
-        var CTM = svg.getScreenCTM();
-        return {
-          x: (evt.clientX - CTM.e) / CTM.a,
-          y: (evt.clientY - CTM.f) / CTM.d
-        };
-      }
-
-    //handle positioning of the svg element during the drag
-    function drag(evt) {
-        if (selectedElement) {
-            evt.preventDefault();
-            var coord = getMousePosition(evt);
-            selectedElement.setAttributeNS(null, "x", coord.x);
-            selectedElement.setAttributeNS(null, "y", coord.y);
-          }
-    }
-
-    //at the end of the drag, save changes and unselect dragged element
-    function endDrag(evt) {
-        APP.save_board();
-        selectedElement = null;
-    }
-  }
 
 
 // This will make everything accessible from the js console;
