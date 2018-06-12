@@ -76,7 +76,6 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     <!-- Right sidebar -->
     <div class="user_space quarter">
         <h5>Your Boards</h5>
-        <p v-if="open_board_name != null">Open Board: ${open_board_name}</p>
         <button v-if="!adding_board" class="btn red" v-on:click="board_create">
             <i class="fa fa-plus"></i> New Board
           </button>
@@ -104,7 +103,7 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
         <!--show all user boards in a list-->
         <tbody v-for="b in curr_boards">
           <!--on click, show images of that user-->
-          <td v-on:click="board_open(b._idx)">
+          <td v-on:click="board_open(b._idx)" v-bind:class="{black: b.id == open_board_id}">
             ${b.board_name}
             <button style="float:right;" v-on:click="board_delete(b._idx)">
                 <i class="fa fa-trash fa-lg"></i>

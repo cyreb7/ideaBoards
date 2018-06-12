@@ -97,11 +97,19 @@ card functions
                 self.vue.form_board_name = null;
                 self.vue.adding_board = false;
                 console.log(self.vue.curr_boards);
+                
+                // Open the new board
+                self.board_open(data._idx);
             });
     }
 
     /*Open the current board */
     self.board_open = function(idx){
+        if (self.vue.curr_boards.length == 0) {
+            // No board to open
+            return;
+        }
+        
         var board_id = self.vue.curr_boards[idx].id;
         var board_name = self.vue.curr_boards[idx].board_name;
         self.vue.open_board_id = board_id;
@@ -117,7 +125,9 @@ card functions
                 svg.innerHTML = data; 
             });
     }
-
+    
+    // Deleted the passed board.
+    // idx is the relative position within curr_boards
     self.board_delete = function(idx){
         var board_id = self.vue.curr_boards[idx].id;
         var question = "Warning: this board will be permanantly deleted. Do you wish to proceed?";
@@ -129,10 +139,13 @@ card functions
                 },
                 function (data) {
                     self.vue.curr_boards.splice(idx, 1);
+                    enumerate(self.vue.curr_boards);
+                    self.board_open(0);
                 });
         }
     }
 
+    // Saves the state of the current board
     self.save_board = function() {
         var board_state = document.getElementById("board").innerHTML;
         $.post(save_board_url,
