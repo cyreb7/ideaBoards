@@ -29,6 +29,7 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
 </style>
 {{end}}
 
+{{if auth.user is not None:}}
 <div id="vue-div" class="display:none container">
     
     <!-- Left sidebar -->
@@ -115,6 +116,14 @@ http://learn.jquery.com/jquery-ui/getting-started/ -->
     </div>
 
 </div>
+
+{{else:}}
+<h2>Please login to view boards</h2>
+<div class="login_button">
+    <a href="{{=URL('default', 'user')}}" class="btn">Login</a>
+</div>
+{{pass}}
+
 <script src="{{=URL('static', 'js/d3.v4.min.js')}}"></script>
 <script src="{{=URL('static', 'js/d3plus-text.full.min.js')}}"></script>
 <script src="{{=URL('static', 'js/jquery-ui.js')}}"></script>
