@@ -122,7 +122,8 @@ card functions
             },
             function (data) {
                 //console.log(board_id, " open and uploaded ", data);
-                svg.innerHTML = data; 
+                svg.innerHTML = data;
+                d3.selectAll("foreignObject").call(d3.drag().on("drag", dragged));
             });
     }
     
@@ -162,13 +163,19 @@ card functions
     Vue components
 ------------------------------------------------------------------------------------
 */
-  
-function dragged(d) {
-    d3.select(this)
-      .attr("x", d3.event.x)
-      .attr("y", d3.event.y);
-  }
 
+    function dragstarted(d) {
+    }
+
+    function dragged(d) {
+        d3.select(this)
+            .attr("x", d3.event.x)
+            .attr("y", d3.event.y);
+    }
+
+    function dragended(d) {
+        self.save_board();
+      }
 
     //redraw the card onto the svg canvas
     svg_draw = function(card, xPos, yPos){
@@ -191,7 +198,10 @@ function dragged(d) {
          .html('<p class=\"idea-card lifted\"><img src=' + card.card_image_url +
               '/><span class=\"padded\">'+ card.caption + '</span></p>');
               
-         d3.selectAll("foreignObject").call(d3.drag().on("drag", dragged));
+         d3.selectAll("foreignObject").call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended));
 
         //save the board after the user makes a change
         self.save_board();
@@ -298,7 +308,6 @@ Code taken from
 http://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/
 -------------------------------------------------------------------------------
 */
-
 
 // This will make everything accessible from the js console;
 // for instance, self.x above would be accessible as APP.x
