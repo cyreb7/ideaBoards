@@ -113,7 +113,7 @@ card functions
                 board_id: board_id
             },
             function (data) {
-                console.log(data);
+                //console.log(board_id, " open and uploaded ", data);
                 svg.innerHTML = data; 
             });
     }
@@ -141,7 +141,7 @@ card functions
                 board_id: self.vue.open_board_id
             },
             function (data) {
-                console.log("Saved board: ", data);
+                console.log("Saved board!");
             });
     }
 /*
@@ -180,6 +180,7 @@ card functions
         // .attr("y", yOffset + 50);
         //.style("width", 90);
         
+        //save the board after the user makes a change
         self.save_board();
 
         //bug text does not have line breaks..
@@ -279,19 +280,24 @@ var APP = null;
 
 
 /*
-Implement dragging within the svg canvas using the example code at
+-------------------------------------------------------------------------------
+Handle drag and drop within the SVG Canvas
+Code taken from
 http://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/
+-------------------------------------------------------------------------------
 */
 
 var selectedElement, offset, transform;
-var selectedElement = false;
+selectedElement = false;
 
+//handle dragging within the svg canvas
 function makeDraggable(evt) {
     var svg = evt.target;
     svg.addEventListener('mousedown', startDrag);
     svg.addEventListener('mousemove', drag);
     svg.addEventListener('mouseup', endDrag);
-    //svg.addEventListener('mouseleave', endDrag);
+    
+    //when the drag starts
     function startDrag(evt) {
             selectedElement = evt.target;
             offset = getMousePosition(evt);
@@ -312,6 +318,7 @@ function makeDraggable(evt) {
           
     }
 
+    //get position of the mouse in the browser
     function getMousePosition(evt) {
         var CTM = svg.getScreenCTM();
         return {
@@ -320,6 +327,7 @@ function makeDraggable(evt) {
         };
       }
 
+    //handle positioning of the svg element during the drag
     function drag(evt) {
         if (selectedElement) {
             evt.preventDefault();
@@ -328,6 +336,8 @@ function makeDraggable(evt) {
             selectedElement.setAttributeNS(null, "y", coord.y);
           }
     }
+
+    //at the end of the drag, save changes and unselect dragged element
     function endDrag(evt) {
         APP.save_board();
         selectedElement = null;
